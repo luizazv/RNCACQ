@@ -51,6 +51,9 @@
     <ClInclude Include="CtrlBD.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="LogMgr.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CtrlCoordenadas.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CtrlBD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

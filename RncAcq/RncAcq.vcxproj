@@ -85,6 +85,7 @@
     <ClInclude Include="CtrlPontosNotaveis.h" />
     <ClInclude Include="Gps.h" />
     <ClInclude Include="Gui.h" />
+    <ClInclude Include="LogMgr.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="QueueMgr.h" />
     <ClInclude Include="Serial.h" />
@@ -98,6 +99,7 @@
     <ClCompile Include="CtrlPontosNotaveis.cpp" />
     <ClCompile Include="Gps.cpp" />
     <ClCompile Include="Gui.cpp" />
+    <ClCompile Include="LogMgr.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QueueMgr.cpp" />
     <ClCompile Include="Serial.cpp" />
