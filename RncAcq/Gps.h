@@ -30,11 +30,12 @@ const int GPS_TIMEOUT =	3;
 //queue message entre GPS e CtrlCoordenadas->gps = produtor
 #define NOME_CTRL_COORDENADAS_QUEUE "CtrlCoordQueueMessage"
 
+#define NOME_ARQUIVO_LOG_SENTENCAS "LogSentencasGps.txt"
+
 struct COORDENADA
 {
-	double valor;
-	//N, S, L, O
-	char hemisferio; 
+	long valor;
+	char hemisferio;
 };
 
 struct GPSDATA
@@ -85,12 +86,13 @@ private:
 	QueueMgr mgpsQueue;
 	QueueMgr mctrlCoordenadasQueue;
 	boost::thread mThread;
+	void *mIdLog;
 	
 	void EnviaSentenca(char *sentenca);
+	void IniciaLog();
+	void GravaLog();
 
 	bool LeDadosGUI();
-//	void Thread(Gps *gps);
-
 
 	bool Passo1(char *Token);
 	bool Passo2(char *Token);

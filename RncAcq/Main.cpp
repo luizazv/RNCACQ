@@ -12,6 +12,7 @@
 #include "CtrlMarcoQuilometrico.h"
 #include "CtrlPontosNotaveis.h"
 #include "CtrlBD.h"
+#include "LogMgr.h"
 
 using namespace std;
 using namespace boost;
@@ -23,6 +24,9 @@ int main()
 	//usa classe GUI até que a interface em QT esteja pronta
 	Gui gui;
 
+	//inicia logger->aqui deve receber informação da Gui para iniciar novo/continuar
+	LogMgr::GetInstance()->IniciaLogging();
+	
 	//inicia controlador de coordenadas->Subject
 	CtrlCoordenadas ctrlCoordenadas;
 	//executa thread do controle de coordenadas

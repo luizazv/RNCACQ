@@ -12,10 +12,12 @@ using namespace std;
 
 struct COORDENADAS
 {
-	double latitude;
-	double longitude;
+	long latitude;
+	long longitude;
 	double velocidade;
+	double altitude;
 };
+
 
 class CtrlCoordenadas : public Subject
 {

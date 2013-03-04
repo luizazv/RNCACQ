@@ -2,7 +2,7 @@
 #include <boost/thread/thread.hpp> 
 #include <boost/tokenizer.hpp>
 #include "Gps.h"
-
+#include "LogMgr.h"
 
 //----------------------------------------------------------------------------------
 Gps::Gps()
@@ -50,12 +50,16 @@ bool Gps::Passo3(char *Token)
 bool Gps::Passo4(char *Token)
 {
 	// Converte de ddmm.mmmm para décimos de segundo de grau
-	mgpsData.latitude.valor = (double) (10*(Token[0]-0x30)+(Token[1]-0x30))*36000 +    
-					          (double)(10*(Token[2]-0x30)+(Token[3]-0x30))*600  +
-					 		  (double)((1000*(Token[5]-0x30)+100*(Token[6]-0x30)+10*(Token[7]-0x30)+(Token[8]-0x30))*6)/100;
+	mgpsData.latitude.valor =	(long)
+								(
+									(double) (10*(Token[0]-0x30)+(Token[1]-0x30))*36000 +    
+									(double)(10*(Token[2]-0x30)+(Token[3]-0x30))*600  +
+					 				(double)((1000*(Token[5]-0x30)+100*(Token[6]-0x30)+10*(Token[7]-0x30)+(Token[8]-0x30))*6)/100
+								);
 
 	return strlen(Token) > 0;
 }
+
 //---------------------------------------------------------------------------------
 bool Gps::Passo5(char *Token)
 {
@@ -76,9 +80,12 @@ bool Gps::Passo5(char *Token)
 bool Gps::Passo6(char *Token)
 {
 	// Converte de dddmm.mmmm para décimos de segundo de grau 
-	mgpsData.longitude.valor = (double)(100*(Token[0]-0x30)+10*(Token[1]-0x30)+(Token[2]-0x30))*36000 +    
-						        (double)(10*(Token[3]-0x30)+(Token[4]-0x30))*600 +
-		 	                    (double)((1000*(Token[6]-0x30)+100*(Token[7]-0x30)+10*(Token[8]-0x30)+(Token[9]-0x30))*6)/100;
+	mgpsData.longitude.valor =	(long)
+								(
+									(double)(100*(Token[0]-0x30)+10*(Token[1]-0x30)+(Token[2]-0x30))*36000 +    
+									(double)(10*(Token[3]-0x30)+(Token[4]-0x30))*600 +
+		 							(double)((1000*(Token[6]-0x30)+100*(Token[7]-0x30)+10*(Token[8]-0x30)+(Token[9]-0x30))*6)/100
+								);
 
 	//longitude (dddmm.mmmm format) 
 	return strlen(Token) > 0;
@@ -108,6 +115,7 @@ bool Gps::Passo8(char *Token)
 	mgpsData.velocidade = (float)(1.852F * atof(Token));
 	return strlen(Token) > 0;
 }
+
 //---------------------------------------------------------------------------------
 bool Gps::Passo9(char *Token)
 {
@@ -115,6 +123,7 @@ bool Gps::Passo9(char *Token)
 	mgpsData.direcao = (unsigned int) (atof(Token) + 0.5F);
 	return true;
 }
+
 //---------------------------------------------------------------------------------
 bool Gps::Passo10(char *Token)
 {
@@ -204,7 +213,7 @@ bool Gps::ParserRMC()
 			//pula primeiro token $xxxxx,
 			beg++;
 			stringstream(*beg) >> tokstr;
-//			pFunc[i](tokstr.c_str());
+			(this->*pFunc[i])((char *)tokstr.c_str());
 		}
 
 		// Leitura correta do pacote RMC
@@ -232,25 +241,27 @@ bool Gps::PassoGGA( char *Token )
 	return( strcmp( Token, "$GPGGA" ) == 0);
 }
 
+//---------------------------------------------------------------------------------
 bool Gps::PassoVazio( char *Token )
 {
 	return true;
 }
 
+//---------------------------------------------------------------------------------
 bool Gps::PassoNroSat( char *Token )
 {
 	mgpsData.nroSatelites = ( unsigned int ) atoi ( Token );
 	return true;
 }
 
+//---------------------------------------------------------------------------------
 bool Gps::PassoHDOP( char *Token )
 {
 	mgpsData.HDOP = ( float )atof ( Token );
 	return true;
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------
 bool Gps::ParserGGA()
 {
 	bool retval = false;
@@ -396,7 +407,7 @@ void Gps::ProgramaGpsSerial()
 	boost::this_thread::sleep(boost::posix_time::milliseconds(200));
 }
 
-////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------
 bool Gps::VerificaSentenca()
 {
 	bool retval = true;
@@ -437,38 +448,7 @@ bool Gps::VerificaSentenca()
 	return retval;
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-// Se GPS serial tiver sentenca válida novamente, volta a pegar GPS pela serial
-// É necessário ter 5 sentencas válidas para voltar para o GPS serial.
 //---------------------------------------------------------------------------------
-/*bool Gps::VerificaSentSerial()
-{
-	static int contGpsValid = 0;
-	static int contFalha = 0;
-	bool Ret = false;
-	if(LeSentenca()) {
-		ParserRMC();  // Executa o Parser
-		if (mgpsData.estado == GPS_VALID) 
-		{ 
-			if(contGpsValid++ > 5) 
-			{
-				contGpsValid = 0;
-				Ret = true;
-			}
-		}
-		else
-		{
-			GpsOneInvalid();		
-		}
-	}
-	else
-		if(contFalha++ > 5) {
-			GpsOneFail();
-			contFalha = 0;
-		}
-	return Ret;
-}*/
-
 void Gps::Executa()
 {
 	mThread = boost::thread(Thread, this);  
@@ -484,11 +464,6 @@ void Gps::Thread(Gps *gps)
 void Gps::EnviaSentenca(char *sentenca)
 {
 	//envia via message queue para CtrlCoordenadas
-
-	
-
-
-
 }
 
 //---------------------------------------------------------------------------------
@@ -550,6 +525,19 @@ void Gps::EnviaParaCtrlCoordenadas()
 }
 
 //---------------------------------------------------------------------------------
+void Gps::IniciaLog()
+{
+	//registra log em LogMgr
+	mIdLog = LogMgr::GetInstance()->Register(NOME_ARQUIVO_LOG_SENTENCAS);
+}
+
+//---------------------------------------------------------------------------------
+void Gps::GravaLog()
+{
+	LogMgr::GetInstance()->Escreve(mIdLog, mSentenca);
+}
+
+//---------------------------------------------------------------------------------
 void Gps::Run()
 {
 	if(LeDadosDaGUI())
@@ -571,6 +559,7 @@ void Gps::Run()
 	case 1:
 		//programa sentencas do GPS
 		ProgramaGpsSerial();
+		IniciaLog();
 		mEstado = 2;
 	break;
 
@@ -583,6 +572,9 @@ void Gps::Run()
 		// Leitura de sentença, pode ser RMC, GGA ou RMO(programação)
 		if( LeSentenca() == true )
 		{
+			//grava sentenca no log
+			GravaLog();
+
 			if ( VerificaSentenca() )
 			{
 				//envia sentenca para controlador de coordenadas
