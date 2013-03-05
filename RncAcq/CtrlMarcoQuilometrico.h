@@ -39,6 +39,7 @@ private:
 	MARCO mmarcoInicial;
 
 	COORDENADAS mcoordenadaAnterior;
+	COORDENADAS mcoordenadaAtual;
 	double mdistanciaAcumulada;
 	double mdistancia10Km;
 
@@ -48,11 +49,13 @@ private:
 	double ConverteGrausParaRadianos (double graus);
 	void SalvarMarcoAtual(MARCO marco);
 	void SalvarMarcoInicial(MARCO marco);
+	void GetCoordenadas(COORDENADAS &dados);
 
 public:
 	CtrlMarcoQuilometrico();
 	
 	void Notify(Subject *p);
+	void EventoSalvarMarcoManual();
 };
 
 

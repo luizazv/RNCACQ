@@ -26,6 +26,14 @@ void CtrlMarcoQuilometrico::SalvarMarcoAtual(MARCO marco)
 }
 
 //-----------------------------------------------------------------------------
+void CtrlMarcoQuilometrico::EventoSalvarMarcoManual()
+{
+	//pega coordenadas atuais
+
+}
+
+
+//-----------------------------------------------------------------------------
 double CtrlMarcoQuilometrico::ConverteGrausParaRadianos (double graus)
 {
 	return (graus * GRAUSTORAD);
@@ -124,7 +132,5 @@ double CtrlMarcoQuilometrico::ControleDeDistanciaDeMarco(COORDENADAS coordenadaA
 void CtrlMarcoQuilometrico::Notify(Subject *p)
 {
 	//processamento de marco->notificado pela thread ctrlCoordenadas
-	COORDENADAS coordenadas;
-
-	((CtrlCoordenadas *)p)->GetCoordenadas(coordenadas);
+	((CtrlCoordenadas *)p)->GetCoordenadas(mcoordenadaAtual);
 }

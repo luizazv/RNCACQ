@@ -20,10 +20,6 @@ using namespace boost::this_thread;
 
 int main()
 {
-	//inicia a GUI (simula interface grafica)
-	//usa classe GUI até que a interface em QT esteja pronta
-	Gui gui;
-
 	//inicia logger->aqui deve receber informação da Gui para iniciar novo/continuar
 	LogMgr::GetInstance()->IniciaLogging();
 	
@@ -51,5 +47,11 @@ int main()
 	//responsavel pelo parser e injeção de sentenças em CtrlCoordenadas
 	Gps gps;
 	gps.Executa();
+
+	//inicia a GUI (simula interface grafica)
+	//usa classe GUI até que a interface em QT esteja pronta
+	//recebe instancias de todos os elementos
+	Gui gui(&ctrlCoordenadas, &ctrlMarcoQuilometrico, &ctrlPontosNotaveis);
+
 }
 

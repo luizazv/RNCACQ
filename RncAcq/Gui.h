@@ -3,11 +3,14 @@
 #define GUIH
 
 #include "QueueMgr.h"
+#include "CtrlCoordenadas.h"
+#include "CtrlMarcoQuilometrico.h"
+#include "CtrlPontosNotaveis.h"
 
 class Gui
 {
 public:
-	Gui();
+	Gui(CtrlCoordenadas *p1, CtrlMarcoQuilometrico *p2, CtrlPontosNotaveis *p3);
 	~Gui();
 
 	void operator () ()
@@ -18,8 +21,12 @@ public:
 private:
 
 	QueueMgr mgpsQueue;
+	CtrlCoordenadas *mctrlCoordenadas;
+	CtrlMarcoQuilometrico *mctrlMarcoQuilometrico;
+	CtrlPontosNotaveis *mctrlPontosNotaveis;
 
 	void Run();
+	int EventoQt();
 
 };
 

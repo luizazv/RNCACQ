@@ -299,7 +299,7 @@ bool Gps::ParserGGA()
 			//pula primeiro token $xxxxx,
 			beg++;
 			stringstream(*beg) >> tokstr;
-//			*pFunc[i](*beg.c_str());
+			(this->*pFunc[i])((char *)tokstr.c_str());
 		}
 
 		if(i == 9)
