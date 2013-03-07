@@ -18,7 +18,9 @@ using namespace std;
 using namespace boost;
 using namespace boost::this_thread;
 
-int main()
+//int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+//int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
+void mainrnc()
 {
 	//inicia logger->aqui deve receber informação da Gui para iniciar novo/continuar
 	LogMgr::GetInstance()->IniciaLogging();

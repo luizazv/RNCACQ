@@ -6,15 +6,21 @@
 #include <string>
 #include <queue>
 #include <fstream>
+#include <iostream>
+
 
 #include "boost\thread.hpp"
 
 using namespace std;
 
+
+#define NOME_ARQUIVO_LOG		"RNCACQ.DAT"
+#define NOME_ARQUIVO_LOG_BKP	"RNCACQ.BKP"
+
 struct LogQueue
 {
+	string tag;
 	string dado;
-	void *pointer;
 };
 
 enum ltipoLog
@@ -30,67 +36,22 @@ private:
 	static LogMgr *mpLogMgr;
 	ltipoLog mtipoLog;
 	boost::thread mThreadLog;
-
-	class LogId
-	{
-	private:
-		std::ofstream hfile;
-
-	public:
-		LogId(string nomeArquivo, ltipoLog tipo)
-		{
-			//abre arquivo para
-			//criação->novo log
-			//append->continua log anterior
-			ios_base::openmode modo;
-
-			if(tipo == ContinuaLogAnterior)
-			{
-				modo = ios_base::out | ios_base::app | ios_base::binary;
-			}
-			else
-			{
-				modo = ios_base::out | ios_base::trunc | ios_base::binary;
-			}
-
-			//abre arquivo
-			hfile.open(nomeArquivo.c_str(), modo);
-		};
-
-		bool write(string log)
-		{
-			bool retval = false;
-
-			try
-			{
-				if(hfile.is_open())
-				{
-					//escreve a string
-					hfile.write(log.c_str(), log.size());
-					retval = true;
-				}
-			}
-			catch(...)
-			{
-				retval = false;
-			}
-
-			return retval;
-		};
-	};
-
+	boost::mutex logMutex;
+	ios_base::openmode mmodo;
 
 	LogMgr();
+
+	bool Retira(LogQueue &log);
 
 public:
 
 	~LogMgr();
 
 	static LogMgr *GetInstance();
-	void *Register(string nomeArquivo);
 
 	void IniciaLogging(ltipoLog tlog = NovoLog);
-	void Escreve(void *p, string dado);
+	void Escreve(string tag, string dado);
+	void EscreveNoArquivo(string linha);
 	static void Thread(LogMgr *logmgr);
 	void Run();
 };

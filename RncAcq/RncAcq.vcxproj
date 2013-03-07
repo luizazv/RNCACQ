@@ -50,12 +50,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Dados\Projetos Daiken\boost_1_53_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Qt5.0.1\5.0.1\msvc2010\include;C:\Dados\Projetos Daiken\RncAcq\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug;C:\Dados\Projetos Daiken\boost_1_53_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\chrono\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\thread\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\regex\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\date_time\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\system\build\msvc-10.0\debug\link-static\threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Qt\Qt5.0.1\5.0.1\msvc2010\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,6 +80,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\RncAcqGui\mainwindow.h" />
     <ClInclude Include="CtrlBD.h" />
     <ClInclude Include="CtrlCoordenadas.h" />
     <ClInclude Include="CtrlMarcoQuilometrico.h" />
@@ -93,6 +95,9 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_mainwindow.cpp" />
+    <ClCompile Include="..\RncAcqGui\main.cpp" />
+    <ClCompile Include="..\RncAcqGui\mainwindow.cpp" />
     <ClCompile Include="CtrlBD.cpp" />
     <ClCompile Include="CtrlCoordenadas.cpp" />
     <ClCompile Include="CtrlMarcoQuilometrico.cpp" />
@@ -100,7 +105,7 @@
     <ClCompile Include="Gps.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="LogMgr.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MainRnc.cpp" />
     <ClCompile Include="QueueMgr.cpp" />
     <ClCompile Include="Serial.cpp" />
   </ItemGroup>

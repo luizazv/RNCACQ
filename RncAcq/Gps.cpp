@@ -525,16 +525,9 @@ void Gps::EnviaParaCtrlCoordenadas()
 }
 
 //---------------------------------------------------------------------------------
-void Gps::IniciaLog()
-{
-	//registra log em LogMgr
-	mIdLog = LogMgr::GetInstance()->Register(NOME_ARQUIVO_LOG_SENTENCAS);
-}
-
-//---------------------------------------------------------------------------------
 void Gps::GravaLog()
 {
-	LogMgr::GetInstance()->Escreve(mIdLog, mSentenca);
+	LogMgr::GetInstance()->Escreve("SENTENCA", mSentenca);
 }
 
 //---------------------------------------------------------------------------------
@@ -559,7 +552,6 @@ void Gps::Run()
 	case 1:
 		//programa sentencas do GPS
 		ProgramaGpsSerial();
-		IniciaLog();
 		mEstado = 2;
 	break;
 

@@ -89,7 +89,6 @@ private:
 	void *mIdLog;
 	
 	void EnviaSentenca(char *sentenca);
-	void IniciaLog();
 	void GravaLog();
 
 	bool LeDadosGUI();
