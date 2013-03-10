@@ -48,10 +48,6 @@ void MainWindow::on_ButtonIniciar_clicked()
     //inicia thread GPS
     string strSerial = comboBoxSerial->currentText().toLocal8Bit();
 
-#ifdef _WORK_VS2010
-	Gui *p = dynamic_cast <Gui *> (mpresenter);
-
-	p->IniciaGps(strSerial);
-#endif
+	mpresenter->IniciaGps(strSerial);
 
 }

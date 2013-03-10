@@ -25,7 +25,8 @@ public:
 		mview = view;
 
 		mmodel = new
-#ifdef _EXCUTANDO_VS2010
+
+#ifdef _EXECUTANDO_VS2010
 		Model();
 #else
 		//executando no QT->necessário para compilar e rodar a GUI no QT sem

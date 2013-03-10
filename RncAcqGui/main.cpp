@@ -4,7 +4,8 @@
 
 //#define _WORK_VS2010
 
-#ifdef _WORK_VS2010
+#ifdef _EXECUTANDO_VS2010
+//elimina a janela do console
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 #endif
 
