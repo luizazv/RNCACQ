@@ -14,9 +14,9 @@ Gps::Gps()
 	mgpsData.estado = GPS_TIMEOUT;
 	mEstado = 0;
 	//message queue do tipo consumidor com a interface gráfica
-	mgpsQueue.InitConsumidor(NOME_GPS_QUEUE);
+//	mgpsQueue.InitConsumidor(NOME_GPS_QUEUE);
 	//message queue do tipo produtor para o controle de coordenadas
-	mctrlCoordenadasQueue.InitProdutor(sizeof(GPSDATA), NOME_CTRL_COORDENADAS_QUEUE);
+//	mctrlCoordenadasQueue.InitProdutor(sizeof(GPSDATA), NOME_CTRL_COORDENADAS_QUEUE);
 }
 
 //---------------------------------------------------------------------------------
@@ -449,9 +449,16 @@ bool Gps::VerificaSentenca()
 }
 
 //---------------------------------------------------------------------------------
-void Gps::Executa()
+void Gps::Inicia(string com)
 {
-	mThread = boost::thread(Thread, this);  
+	if(!mSerial.isOpen())
+	{
+		mSerial.open(com.c_str(), 4800);
+		//um segundo de timeout
+		mSerial.setTimeout(boost::posix_time::seconds(1));
+
+		mThread = boost::thread(Thread, this);  
+	}
 }
 
 //---------------------------------------------------------------------------------
@@ -469,7 +476,7 @@ void Gps::EnviaSentenca(char *sentenca)
 //---------------------------------------------------------------------------------
 bool Gps::LeDadosDaGUI()
 {
-	using namespace boost::interprocess;
+/*	using namespace boost::interprocess;
 
 	bool retval = false;
 
@@ -508,7 +515,8 @@ bool Gps::LeDadosDaGUI()
 		}
 	}
 
-	return retval;
+	return retval;*/
+	return false;
 }
 
 //---------------------------------------------------------------------------------
@@ -521,7 +529,7 @@ bool Gps::VerificaSerialAtiva()
 void Gps::EnviaParaCtrlCoordenadas()
 {
 	//envia dados para CtrlCoordenadas via message_queue
-	mctrlCoordenadasQueue.Send(reinterpret_cast <const char *> (&mgpsData));
+//	mctrlCoordenadasQueue.Send(reinterpret_cast <const char *> (&mgpsData));
 }
 
 //---------------------------------------------------------------------------------

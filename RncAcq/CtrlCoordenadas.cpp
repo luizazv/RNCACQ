@@ -9,7 +9,7 @@
 CtrlCoordenadas::CtrlCoordenadas()
 {
 	//abre queue message do GPS para receber dados de GPS
-	mGpsQueue.InitConsumidor(NOME_CTRL_COORDENADAS_QUEUE);
+//	mGpsQueue.InitConsumidor(NOME_CTRL_COORDENADAS_QUEUE);
 }
 
 //---------------------------------------------------------------------------
@@ -58,7 +58,7 @@ bool CtrlCoordenadas::RecebeDadosGps()
 	bool retval = false;
 
 	//verifica se chegou algo no message queue do GPS
-	if(mGpsQueue.Receive(&mgpsData))
+//	if(mGpsQueue.Receive(&mgpsData))
 	{
 		retval = true;
 	}

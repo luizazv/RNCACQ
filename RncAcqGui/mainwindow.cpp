@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include <QtGui\QPainter>
+#include <string>
+
+#include "c:/dados/projetos daiken/rncacq/rncacq/MVP.h"
 
 class FrameNav : public QFrame
 {
@@ -30,13 +33,25 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     setupUi(this);
 
-    FrameNav *frameNav = new FrameNav(frameBase/*QMainWindow::centralWidget()*/);
+    FrameNav *frameNav = new FrameNav(frameBase);
     frameNav->setGeometry(50, 50, 100, 100);
     frameNav->setFrameShape(QFrame::NoFrame);
     frameNav->setFrameShadow(QFrame::Sunken);
 }
 
-//void MainWindow::on_pushButton_8_clicked()
-//{
-//    pushButton_2->setText("bobo");
-//}
+void MainWindow::on_ButtonRec_clicked()
+{
+}
+
+void MainWindow::on_ButtonIniciar_clicked()
+{
+    //inicia thread GPS
+    string strSerial = comboBoxSerial->currentText().toLocal8Bit();
+
+#ifdef _WORK_VS2010
+	Gui *p = dynamic_cast <Gui *> (mpresenter);
+
+	p->IniciaGps(strSerial);
+#endif
+
+}

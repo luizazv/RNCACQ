@@ -5,7 +5,6 @@
 
 #include <string>
 #include "Observer.h"
-#include "QueueMgr.h"
 #include "Gps.h"
 
 using namespace std;
@@ -23,7 +22,7 @@ class CtrlCoordenadas : public Subject
 {
 private:
 	//queue message entre CtrlCoordenadas e GPS (recebe dados GPS)
-	QueueMgr mGpsQueue;
+//	QueueMgr mGpsQueue;
 	GPSDATA mgpsData;
 	boost::thread mThread;
 	COORDENADAS mdadosCoordenadas;

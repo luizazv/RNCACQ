@@ -13,8 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    iniciargravacao.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += \
+    mainwindow.h \
+    iniciargravacao.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    iniciargravacao.ui

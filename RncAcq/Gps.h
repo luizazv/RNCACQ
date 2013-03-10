@@ -15,10 +15,12 @@
 #ifndef GPSH
 #define GPSH
 
-#include "boost\thread.hpp"
+
 #include <string>
 #include "Serial.h"
 #include "QueueMgr.h"
+#include "boost\thread.hpp"
+
 
 const int GPS_OK      = 0;
 const int GPS_VALID	  =	1;
@@ -47,8 +49,8 @@ struct GPSDATA
 	bool ParserRMC;
 	bool ParserGGA;
 	unsigned int direcao;
-	string hora;
-	string data;
+	std::string hora;
+	std::string data;
 	int estado;
 	int nroSatelites;
 	float HDOP;
@@ -78,13 +80,13 @@ public:
 	void Run();
 
 	static void Thread(Gps *p);
-	void Executa();
+	void Inicia(std::string com);
 
 private:
 	Serial mSerial;
-	string mSentenca;
-	QueueMgr mgpsQueue;
-	QueueMgr mctrlCoordenadasQueue;
+	std::string mSentenca;
+//	QueueMgr mgpsQueue;
+//	QueueMgr mctrlCoordenadasQueue;
 	boost::thread mThread;
 	void *mIdLog;
 	

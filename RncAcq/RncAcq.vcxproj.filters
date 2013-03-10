@@ -48,9 +48,6 @@
     <ClInclude Include="Gps.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Gui.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="CtrlBD.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -59,6 +56,12 @@
     </ClInclude>
     <ClInclude Include="..\RncAcqGui\mainwindow.h">
       <Filter>GuiQt</Filter>
+    </ClInclude>
+    <ClInclude Include="MVP.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,16 +83,10 @@
     <ClCompile Include="QueueMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Gui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CtrlBD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LogMgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRnc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\RncAcqGui\main.cpp">
@@ -100,6 +97,12 @@
     </ClCompile>
     <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_mainwindow.cpp">
       <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="MVP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
