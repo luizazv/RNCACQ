@@ -8,12 +8,24 @@
 using namespace std;
 
 
+enum GPS_EVENTO_ERRO
+{
+	GPS_ERRO_SERIAL,
+	GPS_ERRO_SENTENCA
+};
+
+
 //implementacao de MVP
 
 class IView
 {
 public:
-
+	virtual void ErroGpsFalhaSentenca() = 0;
+	virtual void ErroGpsSentencaInvalida() = 0;
+	virtual void SentencaOk() = 0;
+	virtual void ErroGps() = 0;
+	virtual void SetHdop(int valor) = 0;
+	virtual void SendMsg(const char *msg) = 0;
 };
 
 
@@ -27,7 +39,7 @@ public:
 		mmodel = new
 
 #ifdef _EXECUTANDO_VS2010
-		Model();
+		Model(mview);
 #else
 		//executando no QT->necessário para compilar e rodar a GUI no QT sem
 		//enxergar a implementação de Model
@@ -54,6 +66,10 @@ public:
 		mmodel->ModelTerminarCaptura();
 	};
 
+	virtual void ProcessaPN(PN_TIPO pn)
+	{
+		mmodel->ModelProcessaPN(pn);
+	};
 
 private:
 	IView *mview;
@@ -63,17 +79,13 @@ private:
 
 class View : public IView
 {
+private:
+
 public:
 	View()
 	{
 		mpresenter = new Presenter(this);
 	}
-
-	Presenter *GetPresenter()
-	{
-		return mpresenter;
-	}
-
 
 	Presenter *mpresenter;
 };

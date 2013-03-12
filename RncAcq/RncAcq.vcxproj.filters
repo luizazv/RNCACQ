@@ -104,5 +104,11 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\RncAcqGui\dialogmarco.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogmarco.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

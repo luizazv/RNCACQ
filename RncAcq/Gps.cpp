@@ -5,18 +5,17 @@
 #include "LogMgr.h"
 
 //----------------------------------------------------------------------------------
-Gps::Gps()
+Gps::Gps(Model *model)
 {
+	mmodel = model;
 	mgpsData.velocidade = 0;
 	mgpsData.direcao = 0;
 	mgpsData.latitude.valor = 0;
 	mgpsData.longitude.valor = 0;
 	mgpsData.estado = GPS_TIMEOUT;
 	mEstado = 0;
-	//message queue do tipo consumidor com a interface gráfica
-//	mgpsQueue.InitConsumidor(NOME_GPS_QUEUE);
-	//message queue do tipo produtor para o controle de coordenadas
-//	mctrlCoordenadasQueue.InitProdutor(sizeof(GPSDATA), NOME_CTRL_COORDENADAS_QUEUE);
+	mterminaThread = false;
+	mtolerancia = 0;
 }
 
 //---------------------------------------------------------------------------------
@@ -136,19 +135,23 @@ bool Gps::Passo10(char *Token)
 void Gps::CalculaBcc(char *sBcc)
 {
 	unsigned int i;
-	unsigned int j;
 	int Bcc;
+	char carac;
 
-	//xor de todos os bytes dentro da sentenca (excluindo $ e *),
+	//xor de todos os bytes dentro da sentenca entre $ e *
 	//valor convertido para dois caracteres ASC
-	for(i = 0, j = mSentenca.size() - 6, Bcc = 0; i < j && j < (mSentenca.size() - 1); Bcc ^= mSentenca[i + 1], i++);
 
-	stringstream bccsafe(Bcc);
+	for(i = 1, Bcc = 0; i < mSentenca.size() && (carac = mSentenca[i]) != '*'; i++)
+	{
+		Bcc ^= carac;
+	}
+
+	stringstream bccsafe;
 	string bccstr;
 
-	bccsafe << hex << Bcc;
+	bccsafe << uppercase << hex << setw(2) << setfill('0') << Bcc; 
 	bccsafe >> bccstr; 
-
+	
 	sBcc[0] = bccstr[0];
 	sBcc[1] = bccstr[1];
 }
@@ -168,9 +171,18 @@ bool Gps::VerificaBcc()
 		//evitar que pont acesse memoria maior que mSentenca (caso '*' esteja no último endereço de mSentenca)
 		if(mSentenca.size() >= (unsigned int)(pont + 2) ) 
 		{
-			if(mSentenca[pont + 1] == Bcc[0] && mSentenca[pont + 2] == Bcc[1])
+			char bcc1 = mSentenca[pont + 1];
+			char bcc2 = mSentenca[pont + 2];
+
+			if(bcc1 == Bcc[0] && bcc2 == Bcc[1])
 			{
 				retval = true;
+			}
+			else
+			{
+
+				CalculaBcc(Bcc);
+				retval = false;
 			}
 		}
 	}
@@ -202,18 +214,27 @@ bool Gps::ParserRMC()
 	if(VerificaBcc())
 	{
 		int i = 0;
+
 		string tokstr;
 
 		//variavel para tokenizar a sentenca
-		boost::char_delimiters_separator<char> sep(",");
-		boost::tokenizer<boost::char_delimiters_separator<char>>tok(mSentenca, sep);
+		boost::char_separator<char> sep(",");
+		boost::tokenizer< boost::char_separator<char> >tok(mSentenca, sep);
 
-		for(boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); i++)
+		for(boost::tokenizer< boost::char_separator <char> >::iterator beg = tok.begin(); i < 10 && beg != tok.end(); beg++)
 		{
-			//pula primeiro token $xxxxx,
-			beg++;
 			stringstream(*beg) >> tokstr;
-			(this->*pFunc[i])((char *)tokstr.c_str());
+
+			//pula token $ e , 
+			//tokenizer mantem os separadores como token
+			if(tokstr != "$" && tokstr != ",")
+			{
+				bool ret = (this->*pFunc[i++])((char *)tokstr.c_str());
+				if(!ret)
+				{
+					break;
+				}
+			}
 		}
 
 		// Leitura correta do pacote RMC
@@ -288,24 +309,36 @@ bool Gps::ParserGGA()
 	if(VerificaBcc())
 	{
 		int i = 0;
+
 		string tokstr;
 
 		//variavel para tokenizar a sentenca
-		boost::char_delimiters_separator<char> sep(",");
-		boost::tokenizer<boost::char_delimiters_separator<char>>tok(mSentenca, sep);
+		boost::char_separator<char> sep(",");
+		boost::tokenizer< boost::char_separator<char> >tok(mSentenca, sep);
 
-		for(boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); i++)
+		for(boost::tokenizer< boost::char_separator <char> >::iterator beg = tok.begin(); i < 9 && beg != tok.end(); beg++)
 		{
-			//pula primeiro token $xxxxx,
-			beg++;
 			stringstream(*beg) >> tokstr;
-			(this->*pFunc[i])((char *)tokstr.c_str());
+
+			//pula token $ e , 
+			//tokenizer mantem os separadores como token
+			if(tokstr != "$" && tokstr != ",")
+			{
+				bool ret = (this->*pFunc[i++])((char *)tokstr.c_str());
+				if(!ret)
+				{
+					break;
+				}
+			}
 		}
 
 		if(i == 9)
 		{
 			mgpsData.ParserGGA = true;
 			retval = true;
+
+			mgpsData.VDOP = 0;
+			mgpsData.PDOP = 0;
 		}
 	}
 
@@ -410,35 +443,51 @@ void Gps::ProgramaGpsSerial()
 //---------------------------------------------------------------------------------
 bool Gps::VerificaSentenca()
 {
-	bool retval = true;
+	bool retval;
 
 	if(mSentenca.find("$GPRMC") != string::npos)
 	{
-		// Executa o Parser do pacote RMC.
+		//inicializa leitura de RMC
+		mgpsData.ParserRMC = false;
+
 		if ( ParserRMC() )
 		{
 			mgpsData.ParserRMC = true;	
+			mmodel->SendMsg(mSentenca.c_str());
 		}
 	}
 	else if(mSentenca.find("$GPGGA") != string::npos)
 	{
+		//inicializa leitura de GGA
+		mgpsData.ParserGGA = false;
+
 		if ( ParserGGA() )
 		{
 			mgpsData.ParserGGA = true;
+			mmodel->SendMsg(mSentenca.c_str());
 		}
 	}
-	else if( mSentenca.find("$GPGGA") != string::npos)
+	else if( mSentenca.find("$GPGSA") != string::npos)
 	{
 		// Executa o Parser do pacote GGA.
+		mmodel->SendMsg(mSentenca.c_str());
 	}
 	else if( mSentenca.find("$GPGSV") != string::npos)
 	{
 		//IGNORA SENTENÇA
+		mmodel->SendMsg("");
 	}
 	else if( mSentenca.find("$PGRMO") != string::npos)
 	{
 		//IGNORA SENTENÇA
 		//GPRMO É SENTENÇA DE CONFIRMAÇÃO DE CONFIGURAÇÃO
+		mmodel->SendMsg("");
+	}
+
+	//retorna estrutura apenas se PRMC & GGA foram lidas
+	if(mgpsData.ParserRMC && mgpsData.ParserGGA)
+	{
+		retval = true;
 	}
 	else
 	{
@@ -451,6 +500,8 @@ bool Gps::VerificaSentenca()
 //---------------------------------------------------------------------------------
 void Gps::Inicia(string com)
 {
+	mterminaThread = false;
+
 	if(!mSerial.isOpen())
 	{
 		mSerial.open(com.c_str(), 4800);
@@ -459,6 +510,14 @@ void Gps::Inicia(string com)
 
 		mThread = boost::thread(Thread, this);  
 	}
+}
+
+//---------------------------------------------------------------------------------
+void Gps::Termina()
+{
+	mterminaThread = true;
+	//aguarda thread terminar
+	mThread.join();
 }
 
 //---------------------------------------------------------------------------------
@@ -474,52 +533,6 @@ void Gps::EnviaSentenca(char *sentenca)
 }
 
 //---------------------------------------------------------------------------------
-bool Gps::LeDadosDaGUI()
-{
-/*	using namespace boost::interprocess;
-
-	bool retval = false;
-
-	//estrutura lida da GUI
-	SERIALDATA ser;
-
-	//recebe a estrutura da GUI contendo dados da serial
-	if(mgpsQueue.Receive(&ser))
-	{
-		//indica que recebeu dados da GUI
-		retval = true;
-
-		//recebeu info da GUI
-		try
-		{
-			//executa a função solicitada
-			if(ser.acao == ser.serClose)
-			{
-				if(mSerial.isOpen())
-				{
-					mSerial.close();
-				}
-			}
-			else
-			{
-				if(mSerial.isOpen())
-				{
-					mSerial.open(ser.devName, ser.baudrate);
-					//um segundo de timeout
-					mSerial.setTimeout(boost::posix_time::seconds(1));
-				}
-			}
-		}
-		catch(...)
-		{
-		}
-	}
-
-	return retval;*/
-	return false;
-}
-
-//---------------------------------------------------------------------------------
 bool Gps::VerificaSerialAtiva()
 {
 	return mSerial.isOpen();
@@ -528,6 +541,7 @@ bool Gps::VerificaSerialAtiva()
 //---------------------------------------------------------------------------------
 void Gps::EnviaParaCtrlCoordenadas()
 {
+
 	//envia dados para CtrlCoordenadas via message_queue
 //	mctrlCoordenadasQueue.Send(reinterpret_cast <const char *> (&mgpsData));
 }
@@ -539,53 +553,101 @@ void Gps::GravaLog()
 }
 
 //---------------------------------------------------------------------------------
+void Gps::ProcessaSentenca()
+{
+
+	if ( VerificaSentenca() )
+	{
+		//recebeu as sentenças GPRMC & GGA
+		//verifica se sentenca GPRMC está válida
+		if( mgpsData.receiverWarning == 'A' )
+		{
+			//envia dados do GPS para controlador de coordenadas
+			EnviaParaCtrlCoordenadas();
+
+			//indica que a sentenca GPRMC é válida e recebeu tmabém a GGA (icone GPS verde)
+			mmodel->SentencaOk();
+			//atualiza 
+			mmodel->SetHdop(mgpsData.HDOP);
+		}
+		else
+		{
+			//indica sentenca invalida-> ativa icone amarelo
+			mmodel->ErroGpsSentencaInvalida();
+		}
+
+		mtolerancia = 0;
+	}
+	else
+	{
+		//não recebeu as sentencas GPRMC & GGA
+		if(mtolerancia > 4)
+		{
+			//com tolerancia de 4 leituras avisa GUI que
+			//não recebeu as sentencas esperadas (icone amarelo)
+			mmodel->ErroGpsSentencaInvalida();
+		}
+		else
+		{
+			mtolerancia++;
+		}
+	}
+}
+
+//---------------------------------------------------------------------------------
 void Gps::Run()
 {
-	if(LeDadosDaGUI())
+	while(!mterminaThread)
 	{
-		//recebeu dados da GUI->reinicia configuração da serial
-		mEstado = 0;
-	}
 
-	//verifica estado da serial deixado por LeDadosDaGUI()
-	mEstado = VerificaSerialAtiva() ? 1 : 0;
-
-	switch (mEstado) 
-	{
-	case 0:
-		//delay para nova tentativa de configuração
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	break;
-
-	case 1:
-		//programa sentencas do GPS
-		ProgramaGpsSerial();
-		mEstado = 2;
-	break;
-
-	case 2:
-		// Indicador dos pacotes tratados.
-		mgpsData.ParserRMC = false;
-		mgpsData.ParserGGA = false;
-		mgpsData.estado = GPS_INVALID;
-
-		// Leitura de sentença, pode ser RMC, GGA ou RMO(programação)
-		if( LeSentenca() == true )
+		if(VerificaSerialAtiva())
 		{
-			//grava sentenca no log
-			GravaLog();
+			switch (mEstado) 
+			{
+			case 0:
+				//programa sentencas do GPS
+				ProgramaGpsSerial();
+				mEstado = 1;
+			break;
 
-			if ( VerificaSentenca() )
-			{
-				//envia sentenca para controlador de coordenadas
-				EnviaParaCtrlCoordenadas();
+			case 1:
+				// Leitura de sentença, pode ser RMC, GGA ou RMO(programação)
+				if( LeSentenca() == true )
+				{
+					//grava sentenca no log-> se estiver em modo gravação
+
+					if(mmodel->ModoGravacao())
+					{
+						GravaLog();
+					}
+
+					//verifica se recebeu as sentencas esperadas e aciona os ícones
+					ProcessaSentenca();
+				}
+				else
+				{
+					//avisar GUI que não está recebendo sentenças (icone vermelho)
+					mmodel->ErroGpsFalhaSentenca();
+					mmodel->SetHdop(HDOP_FIMESCALA);
+					boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+				}
+			break;
 			}
-			else
-			{
-				mEstado = 0;
-			}
+
+			//delay loop principal da thread
+			boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 		}
-	break;
+		else
+		{
+			mterminaThread = true;
+		}
 	}
+
+	//envia mensagem para GUI e termina thread
+	mmodel->ErroGps();
+	mmodel->SetHdop(HDOP_FIMESCALA);
+	mSerial.close();
+	mmodel->SendMsg("");
+
 }
 

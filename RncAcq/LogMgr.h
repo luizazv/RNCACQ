@@ -38,6 +38,7 @@ private:
 	boost::thread mThreadLog;
 	boost::mutex logMutex;
 	ios_base::openmode mmodo;
+	bool mterminaThread;
 
 	LogMgr();
 

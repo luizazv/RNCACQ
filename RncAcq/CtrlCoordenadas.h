@@ -6,6 +6,7 @@
 #include <string>
 #include "Observer.h"
 #include "Gps.h"
+#include "Model.h"
 
 using namespace std;
 
@@ -26,13 +27,14 @@ private:
 	GPSDATA mgpsData;
 	boost::thread mThread;
 	COORDENADAS mdadosCoordenadas;
+	Model *mmodel;
 
 	void ExecutaProcessamento();
 	void SentencaGps(string sentenca);
 	bool RecebeDadosGps();
 
 public:
-	CtrlCoordenadas();
+	CtrlCoordenadas(Model *model);
 
 	void Executa();
 	void static Thread(CtrlCoordenadas *p);

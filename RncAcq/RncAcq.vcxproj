@@ -95,7 +95,9 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogmarco.cpp" />
     <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_mainwindow.cpp" />
+    <ClCompile Include="..\RncAcqGui\dialogmarco.cpp" />
     <ClCompile Include="..\RncAcqGui\main.cpp" />
     <ClCompile Include="..\RncAcqGui\mainwindow.cpp" />
     <ClCompile Include="CtrlBD.cpp" />

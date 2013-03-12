@@ -14,11 +14,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    iniciargravacao.cpp
+    dialogmarco.cpp
 
 HEADERS  += \
     mainwindow.h \
-    iniciargravacao.h
+    dialogmarco.h
 
 FORMS    += mainwindow.ui \
-    iniciargravacao.ui
+    dialogmarco.ui
+
+RESOURCES += \
+    Gauge.qrc
+
+OTHER_FILES +=

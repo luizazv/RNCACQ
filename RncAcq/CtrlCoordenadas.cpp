@@ -6,8 +6,9 @@
 #include <boost/thread/thread.hpp> 
 
 //---------------------------------------------------------------------------
-CtrlCoordenadas::CtrlCoordenadas()
+CtrlCoordenadas::CtrlCoordenadas(Model *model)
 {
+	mmodel = model;
 	//abre queue message do GPS para receber dados de GPS
 //	mGpsQueue.InitConsumidor(NOME_CTRL_COORDENADAS_QUEUE);
 }

@@ -20,6 +20,7 @@
 #include "Serial.h"
 #include "QueueMgr.h"
 #include "boost\thread.hpp"
+#include "Model.h"
 
 
 const int GPS_OK      = 0;
@@ -27,12 +28,10 @@ const int GPS_VALID	  =	1;
 const int GPS_INVALID =	2;
 const int GPS_TIMEOUT =	3;
 
-//queue message entre GPS e GUI->gps = consumidor
-#define NOME_GPS_QUEUE "GpsQueueMessage"
 //queue message entre GPS e CtrlCoordenadas->gps = produtor
-#define NOME_CTRL_COORDENADAS_QUEUE "CtrlCoordQueueMessage"
+#define NOME_CTRL_COORDENADAS_QUEUE "GpsCtrlCoordQueue"
 
-#define NOME_ARQUIVO_LOG_SENTENCAS "LogSentencasGps.txt"
+#define HDOP_FIMESCALA 100
 
 struct COORDENADA
 {
@@ -74,21 +73,27 @@ struct SERIALDATA
 class Gps
 { 
 public:
-	Gps();
+	Gps(Model *model);
 	~Gps();
 
 	void Run();
 
 	static void Thread(Gps *p);
+	//inicia leitura do GPS
 	void Inicia(std::string com);
+	//termina leitura do GPS
+	void Termina();
 
 private:
 	Serial mSerial;
 	std::string mSentenca;
+	Model *mmodel;
 //	QueueMgr mgpsQueue;
 //	QueueMgr mctrlCoordenadasQueue;
 	boost::thread mThread;
 	void *mIdLog;
+	bool mterminaThread;
+	int mtolerancia;
 	
 	void EnviaSentenca(char *sentenca);
 	void GravaLog();
@@ -125,8 +130,8 @@ private:
 	void FalhaSentenca();
 	bool VerificaSerialAtiva();
 	int  MontaSentencaConfTrimble(char *sent);
-	bool LeDadosDaGUI();
 	void EnviaParaCtrlCoordenadas();
+	void ProcessaSentenca();
 
     int mEstado;
 	GPSDATA mgpsData;

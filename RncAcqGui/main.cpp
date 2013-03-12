@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QtWidgets/QApplication>
 
+#include "c:/dados/projetos daiken/rncacq/rncacq/Model.h"
 
 //#define _WORK_VS2010
 

@@ -14,6 +14,9 @@ LogMgr *LogMgr::mpLogMgr = NULL;
 LogMgr::LogMgr()
 {
 	mtipoLog = ContinuaLogAnterior;
+
+	mterminaThread = false;
+	IniciaLogging();
 }
 
 //-----------------------------------------------------------------------------
@@ -77,26 +80,39 @@ void LogMgr::IniciaLogging(ltipoLog tlog)
 }
 
 //---------------------------------------------------------------------------------
-void LogMgr::EscreveNoArquivo(string linha)
-{
 	std::ofstream hfile;
 	std::ofstream hfilebkp;
 
+	bool first = true;
+
+void LogMgr::EscreveNoArquivo(string linha)
+{
+
 	//abre arquivo
-	hfile.open(NOME_ARQUIVO_LOG, mmodo);
-	hfilebkp.open(NOME_ARQUIVO_LOG_BKP, mmodo);
+	if(!hfile.is_open())
+	{
+		hfile.open(NOME_ARQUIVO_LOG, ios::app | ios::binary);
+		hfilebkp.open(NOME_ARQUIVO_LOG_BKP, ios::app | ios::binary);
+	}
 
 	if(hfile.is_open())
 	{
+		if(first)
+		{
+			hfile << "[INICIO]" << endl;
+			first = false;
+		}
+
 		hfile << linha << endl;
-		hfile.close();
+		hfile.flush();
+//		hfile.close();
 	}
 
-	if(hfilebkp.is_open())
-	{
-		hfilebkp << linha << endl;
-		hfilebkp.close();
-	}
+//	if(hfilebkp.is_open())
+//	{
+//		hfilebkp << linha << endl;
+//		hfilebkp.close();
+//	}
 }
 
 //---------------------------------------------------------------------------------
@@ -111,16 +127,21 @@ void LogMgr::Run()
 	//grava os pedidos de gravação presentes no vetor de pedidos
 	LogQueue log;
 
-	if(	Retira(log) )
+	while(!mterminaThread)
 	{
-		//adiciona tag do elemento 
-		string linha("tag[");
-		linha += log.tag;
-		linha += "]:dado[";
-		linha += log.dado;
-		linha += "]";
+		if(	Retira(log) )
+		{
+			//adiciona tag do elemento 
+			string linha("tag[");
+			linha += log.tag;
+			linha += "]:dado[";
+			linha += log.dado;
+			linha += "]";
 
-		EscreveNoArquivo(linha);
+			EscreveNoArquivo(linha);
+		}
+
+		boost::this_thread::sleep(boost::posix_time::milliseconds(200));
 	}
 }
 
