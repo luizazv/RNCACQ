@@ -42,10 +42,10 @@ public:
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
         lineEditMarco = new QLineEdit(DialogMarco);
         lineEditMarco->setObjectName(QStringLiteral("lineEditMarco"));
-        lineEditMarco->setGeometry(QRect(70, 100, 113, 20));
+        lineEditMarco->setGeometry(QRect(70, 80, 113, 20));
         label = new QLabel(DialogMarco);
         label->setObjectName(QStringLiteral("label"));
-        label->setGeometry(QRect(70, 70, 111, 16));
+        label->setGeometry(QRect(70, 50, 111, 16));
 
         retranslateUi(DialogMarco);
         QObject::connect(buttonBox, SIGNAL(accepted()), DialogMarco, SLOT(accept()));
@@ -58,7 +58,7 @@ public:
     {
         DialogMarco->setWindowTitle(QApplication::translate("DialogMarco", "Dialog", 0));
         lineEditMarco->setInputMask(QApplication::translate("DialogMarco", "99999999", 0));
-        label->setText(QApplication::translate("DialogMarco", "Marco Inicial", 0));
+        label->setText(QApplication::translate("DialogMarco", "Marco em Km", 0));
     } // retranslateUi
 
 };

@@ -27,7 +27,7 @@ private:
 		ESTADO_VERDE
 	}mestadoGps;
 
-
+	std::vector< std::string > ListaSbsAbertas;
 
 private slots:
 	void on_ButtonRec_clicked();
@@ -37,6 +37,12 @@ private slots:
     void on_pushButtonTunel_clicked();
     void on_pushButtonPN_clicked();
     void on_pushButtonInicioSb_clicked();
+    void on_pushButtonFimSb_clicked();
+    void on_pushButtonMarco_clicked();
+    void on_pushButtonUsuario_clicked();
+    void on_pushButtonTunel_2_clicked();
+    void on_pushButtonPonte_2_clicked();
+    void on_pushButton_clicked();
 };
 
 #endif // MAINWINDOW_H

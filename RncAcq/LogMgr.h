@@ -41,20 +41,19 @@ private:
 	bool mterminaThread;
 
 	LogMgr();
+	~LogMgr();
 
 	bool Retira(LogQueue &log);
+	void EscreveNoArquivo(string linha);
+	static void Thread(LogMgr *logmgr);
+	void Run();
 
 public:
-
-	~LogMgr();
 
 	static LogMgr *GetInstance();
 
 	void IniciaLogging(ltipoLog tlog = NovoLog);
 	void Escreve(string tag, string dado);
-	void EscreveNoArquivo(string linha);
-	static void Thread(LogMgr *logmgr);
-	void Run();
 };
 
 #endif

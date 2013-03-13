@@ -1,12 +1,22 @@
 #include "mainwindow.h"
 #include "dialogmarco.h"
+#include "dialogabrirsb.h"
+#include "dialogfecharsb.h"
+#include "dialogdefinidousuario.h"
 #include <QtGui\QPainter>
 #include <string>
 #include <QtWidgets\QMessageBox>
+#include <QtCore\QTimer>
 
 #include "c:/dados/projetos daiken/rncacq/rncacq/MVP.h"
 #include "c:/dados/projetos daiken/rncacq/rncacq/Model.h"
 
+int k = 150;
+int xp1 = 15;
+int yp1 = 20;
+
+std::vector< int > xp;
+std::vector< int > xy;
 
 class FrameNav : public QFrame
 {
@@ -19,17 +29,30 @@ public:
     {
         QPainter painter(this);
 
+        xp1++;
+        xp.push_back(xp1);
+        yp1++;
+        xy.push_back(yp1);
+
+
         //First Circle:
         //width&height:150px
         //Beginning(x/y):50px/30px
         //Each step for Angle parameter is 1/16th of a Degree
         //so multiply Angle Value with 16
-        painter.drawArc(5,5,150,150,0,16*360);
+        painter.drawArc(5,5, k+= 15,150,0,16*360);
         painter.drawRect(0, 0, 10, 10);
+
+        for(unsigned int i = 0; i < xp.size(); i++)
+        {
+            painter.drawPoint(xp[i], xy[i]);
+        }
     }
 
 
 };
+
+FrameNav *frameNav;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -37,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     setupUi(this);
 
-    FrameNav *frameNav = new FrameNav(frameBase);
+    frameNav = new FrameNav(frameBase);
     frameNav->setGeometry(50, 50, 100, 100);
     frameNav->setFrameShape(QFrame::NoFrame);
     frameNav->setFrameShadow(QFrame::Sunken);
@@ -155,7 +178,13 @@ void MainWindow::SetHdop(int valor)
 
 void MainWindow::SendMsg(const char *msg)
 {
-//	labelSentenca->setText(msg);
+//	QMessageBox::information(NULL, "ATENCAO", msg);
+
+    QMessageBox *mbox = new QMessageBox;
+    mbox->setWindowTitle("ATENCAO");
+    mbox->setText(msg);
+    mbox->show();
+	QTimer::singleShot(5000, mbox, SLOT(hide()));
 }
 
 
@@ -185,19 +214,154 @@ void MainWindow::on_ButtonStop_clicked()
 
 void MainWindow::on_pushButtonPonte_clicked()
 {
-    mpresenter->ProcessaPN(PN_PONTE);
+	PN_DATA data;
+
+	data.pntipo = PN_INICIOPONTE;
+
+    mpresenter->ProcessaPN(data);
+}
+
+void MainWindow::on_pushButtonPonte_2_clicked()
+{
+    PN_DATA data;
+
+    data.pntipo = PN_FIMPONTE;
+
+    mpresenter->ProcessaPN(data);
 }
 
 void MainWindow::on_pushButtonTunel_clicked()
 {
-    mpresenter->ProcessaPN(PN_TUNEL);
+	PN_DATA data;
+
+	data.pntipo = PN_INICIOTUNEL;
+
+    mpresenter->ProcessaPN(data);
 }
+
+void MainWindow::on_pushButtonTunel_2_clicked()
+{
+    PN_DATA data;
+
+    data.pntipo = PN_FIMTUNEL;
+
+    mpresenter->ProcessaPN(data);
+}
+
 
 void MainWindow::on_pushButtonPN_clicked()
 {
-    mpresenter->ProcessaPN(PN_PASSAGEMNIVEL);
+	PN_DATA data;
+
+	data.pntipo = PN_PASSAGEMNIVEL;
+
+
+    mpresenter->ProcessaPN(data);
 }
 
 void MainWindow::on_pushButtonInicioSb_clicked()
 {
+    DialogAbrirSB dialogAbrir;
+
+    if(dialogAbrir.exec() == 1)
+    {
+        //valida e envia para controle de pontos notaveis
+		PN_DATA pn;
+
+		pn.Marco = dialogAbrir.Marco();
+		pn.Sb = dialogAbrir.Sb();
+
+		//select = true-> um dos elementos foi selecionado
+		bool select = dialogAbrir.SelecaoInicio(pn.pntipoinicio);
+
+		if(select)
+		{
+			select = dialogAbrir.SelecaoDesvio(pn.pndesvio);
+		}
+
+		if(select)
+		{
+			select = dialogAbrir.SelecaoSentido(pn.pnsentido);
+		}
+
+		//verifica se algum dos radiobutton está selecionado
+		if(select)
+		{
+			//um dos elementos foi selecionado->processa
+			mpresenter->ProcessaPN(pn);
+
+			ListaSbsAbertas.push_back(pn.Sb);
+		}
+		else
+		{
+            QMessageBox::information(this, "ATENCAO", "FALTOU SELECIONAR ALGUM ELEMENTO AO MARCAR FECHAMENTO DE SB");
+		}
+    }
+}
+
+void MainWindow::on_pushButtonFimSb_clicked()
+{
+    DialogFecharSB dialogFechar;
+
+    if(dialogFechar.exec() == 1)
+    {
+        //dados ok->valida e envia para controle de pontos notaveis
+        //valida e envia para controle de pontos notaveis
+        PN_DATA pn;
+
+        pn.Sb = dialogFechar.SbParaFechar();
+
+        //select = true-> um dos elementos foi selecionado
+		bool select = dialogFechar.SelecaoChave(pn.pnchave);
+
+        //verifica se todos os radiobutton foram selecionados
+        if(select)
+        {
+            //um dos elementos foi selecionado->processa
+            mpresenter->ProcessaPN(pn);
+
+			//retira SB da lista
+			for(unsigned int i = 0; i < ListaSbsAbertas.size(); i++)
+			{
+				if(ListaSbsAbertas[i] == pn.Sb)
+				{
+					//retira da lista
+					ListaSbsAbertas.erase(ListaSbsAbertas.begin() + i);
+					break;
+				}
+			}
+        }
+        else
+        {
+            QMessageBox::information(this, "ATENCAO", "FALTOU SELECIONAR ALGUM ELEMENTO AO MARCAR ABERTURA DE SB");
+        }
+    }
+}
+
+void MainWindow::on_pushButtonMarco_clicked()
+{
+    DialogMarco dialogMarco;
+
+    if(dialogMarco.exec() == 1)
+    {
+
+    }
+}
+
+void MainWindow::on_pushButtonUsuario_clicked()
+{
+    DialogDefinidoUsuario dialogUser;
+
+    if(dialogUser.exec() == 1)
+    {
+
+    }
+
+}
+
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    frameNav->repaint();
 }

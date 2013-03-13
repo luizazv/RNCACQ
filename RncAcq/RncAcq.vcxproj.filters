@@ -63,6 +63,18 @@
     <ClInclude Include="Model.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\RncAcqGui\dialogabrirsb.h">
+      <Filter>GuiQt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RncAcqGui\dialogdefinidousuario.h">
+      <Filter>GuiQt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RncAcqGui\dialogfecharsb.h">
+      <Filter>GuiQt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RncAcqGui\dialogmarco.h">
+      <Filter>GuiQt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CtrlCoordenadas.cpp">
@@ -108,6 +120,24 @@
       <Filter>GuiQt</Filter>
     </ClCompile>
     <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogmarco.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogabrirsb.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogdefinidousuario.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogfecharsb.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui\dialogabrirsb.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui\dialogdefinidousuario.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui\dialogfecharsb.cpp">
       <Filter>GuiQt</Filter>
     </ClCompile>
   </ItemGroup>

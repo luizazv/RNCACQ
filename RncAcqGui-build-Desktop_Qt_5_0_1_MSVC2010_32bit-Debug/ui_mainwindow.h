@@ -20,7 +20,6 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLCDNumber>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -53,27 +52,28 @@ public:
     QComboBox *comboBoxSerial;
     QLabel *label_2;
     QLabel *labelMarcoInicial;
-    QFrame *frame_3;
-    QLineEdit *lineEdit_2;
-    QLineEdit *lineEdit_3;
-    QLineEdit *lineEdit_4;
-    QWidget *layoutWidget1;
-    QHBoxLayout *horizontalLayout;
-    QPushButton *pushButtonInicioSb;
-    QSpacerItem *verticalSpacer;
-    QPushButton *pushButtonFimSb;
-    QSpacerItem *verticalSpacer_2;
-    QPushButton *pushButtonMarco;
+    QLabel *label_6;
+    QLabel *labelMarcoInicial_2;
     QFrame *frameBase;
     QGroupBox *groupBox;
     QFrame *frame_2;
-    QWidget *layoutWidget2;
+    QWidget *layoutWidget1;
     QVBoxLayout *verticalLayout;
-    QPushButton *pushButtonPonte;
+    QPushButton *pushButtonInicioSb;
+    QPushButton *pushButtonFimSb;
+    QSpacerItem *verticalSpacer_3;
     QPushButton *pushButtonTunel;
+    QPushButton *pushButtonTunel_2;
+    QSpacerItem *verticalSpacer_4;
+    QPushButton *pushButtonPonte;
+    QPushButton *pushButtonPonte_2;
+    QSpacerItem *verticalSpacer_5;
+    QSpacerItem *verticalSpacer;
     QPushButton *pushButtonPN;
-    QPushButton *pushButton_7;
-    QPushButton *pushButton_5;
+    QSpacerItem *verticalSpacer_6;
+    QPushButton *pushButtonMarco;
+    QSpacerItem *verticalSpacer_7;
+    QPushButton *pushButtonUsuario;
     QFrame *frame_5;
     QLabel *label_3;
     QLCDNumber *lcdNumber;
@@ -84,6 +84,7 @@ public:
     QWidget *widget_4;
     QSlider *horizontalSliderHdop;
     QLabel *label_4;
+    QPushButton *pushButton;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -92,34 +93,34 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(1284, 788);
-        MainWindow->setMinimumSize(QSize(1284, 788));
-        MainWindow->setMaximumSize(QSize(1284, 788));
+        MainWindow->resize(1284, 700);
+        MainWindow->setMinimumSize(QSize(1284, 700));
+        MainWindow->setMaximumSize(QSize(1284, 700));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         frame = new QFrame(centralWidget);
         frame->setObjectName(QStringLiteral("frame"));
-        frame->setGeometry(QRect(760, 460, 501, 241));
+        frame->setGeometry(QRect(760, 440, 501, 191));
         frame->setFrameShape(QFrame::Panel);
         frame->setFrameShadow(QFrame::Raised);
         frame_8 = new QFrame(frame);
         frame_8->setObjectName(QStringLiteral("frame_8"));
-        frame_8->setGeometry(QRect(10, 70, 481, 161));
+        frame_8->setGeometry(QRect(10, 90, 481, 91));
         frame_8->setFrameShape(QFrame::Panel);
         frame_8->setFrameShadow(QFrame::Sunken);
         frameEstadoGps = new QFrame(frame_8);
         frameEstadoGps->setObjectName(QStringLiteral("frameEstadoGps"));
-        frameEstadoGps->setGeometry(QRect(420, 10, 41, 31));
+        frameEstadoGps->setGeometry(QRect(400, 30, 41, 31));
         frameEstadoGps->setStyleSheet(QStringLiteral("background-color: rgb(255, 0, 0);"));
         frameEstadoGps->setFrameShape(QFrame::Panel);
         frameEstadoGps->setFrameShadow(QFrame::Plain);
         frameEstadoGps->setLineWidth(3);
         label_5 = new QLabel(frame_8);
         label_5->setObjectName(QStringLiteral("label_5"));
-        label_5->setGeometry(QRect(340, 20, 71, 16));
+        label_5->setGeometry(QRect(390, 10, 71, 16));
         layoutWidget = new QWidget(frame_8);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(70, 80, 341, 68));
+        layoutWidget->setGeometry(QRect(10, 10, 341, 68));
         horizontalLayout_2 = new QHBoxLayout(layoutWidget);
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
@@ -169,116 +170,129 @@ public:
 
         frame_9 = new QFrame(frame);
         frame_9->setObjectName(QStringLiteral("frame_9"));
-        frame_9->setGeometry(QRect(10, 10, 481, 51));
+        frame_9->setGeometry(QRect(10, 10, 481, 71));
         frame_9->setFrameShape(QFrame::Panel);
         frame_9->setFrameShadow(QFrame::Sunken);
         label = new QLabel(frame_9);
         label->setObjectName(QStringLiteral("label"));
-        label->setGeometry(QRect(280, 20, 61, 16));
+        label->setGeometry(QRect(230, 10, 61, 16));
         comboBoxSerial = new QComboBox(frame_9);
         comboBoxSerial->setObjectName(QStringLiteral("comboBoxSerial"));
-        comboBoxSerial->setGeometry(QRect(90, 18, 101, 22));
+        comboBoxSerial->setGeometry(QRect(20, 40, 101, 22));
         label_2 = new QLabel(frame_9);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(10, 20, 81, 16));
+        label_2->setGeometry(QRect(30, 10, 81, 16));
         labelMarcoInicial = new QLabel(frame_9);
         labelMarcoInicial->setObjectName(QStringLiteral("labelMarcoInicial"));
-        labelMarcoInicial->setGeometry(QRect(355, 19, 111, 21));
+        labelMarcoInicial->setGeometry(QRect(320, 10, 111, 21));
         labelMarcoInicial->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
         labelMarcoInicial->setFrameShape(QFrame::Panel);
         labelMarcoInicial->setFrameShadow(QFrame::Plain);
-        labelMarcoInicial->setLineWidth(2);
-        frame_3 = new QFrame(centralWidget);
-        frame_3->setObjectName(QStringLiteral("frame_3"));
-        frame_3->setGeometry(QRect(210, 610, 541, 91));
-        frame_3->setFrameShape(QFrame::Panel);
-        frame_3->setFrameShadow(QFrame::Sunken);
-        lineEdit_2 = new QLineEdit(frame_3);
-        lineEdit_2->setObjectName(QStringLiteral("lineEdit_2"));
-        lineEdit_2->setGeometry(QRect(430, 60, 91, 20));
-        lineEdit_3 = new QLineEdit(frame_3);
-        lineEdit_3->setObjectName(QStringLiteral("lineEdit_3"));
-        lineEdit_3->setGeometry(QRect(10, 60, 91, 20));
-        lineEdit_4 = new QLineEdit(frame_3);
-        lineEdit_4->setObjectName(QStringLiteral("lineEdit_4"));
-        lineEdit_4->setGeometry(QRect(220, 60, 91, 20));
-        layoutWidget1 = new QWidget(frame_3);
-        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(10, 10, 521, 42));
-        horizontalLayout = new QHBoxLayout(layoutWidget1);
-        horizontalLayout->setSpacing(6);
-        horizontalLayout->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        pushButtonInicioSb = new QPushButton(layoutWidget1);
-        pushButtonInicioSb->setObjectName(QStringLiteral("pushButtonInicioSb"));
-
-        horizontalLayout->addWidget(pushButtonInicioSb);
-
-        verticalSpacer = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-        horizontalLayout->addItem(verticalSpacer);
-
-        pushButtonFimSb = new QPushButton(layoutWidget1);
-        pushButtonFimSb->setObjectName(QStringLiteral("pushButtonFimSb"));
-
-        horizontalLayout->addWidget(pushButtonFimSb);
-
-        verticalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-        horizontalLayout->addItem(verticalSpacer_2);
-
-        pushButtonMarco = new QPushButton(layoutWidget1);
-        pushButtonMarco->setObjectName(QStringLiteral("pushButtonMarco"));
-
-        horizontalLayout->addWidget(pushButtonMarco);
-
+        labelMarcoInicial->setLineWidth(1);
+        label_6 = new QLabel(frame_9);
+        label_6->setObjectName(QStringLiteral("label_6"));
+        label_6->setGeometry(QRect(230, 40, 71, 16));
+        labelMarcoInicial_2 = new QLabel(frame_9);
+        labelMarcoInicial_2->setObjectName(QStringLiteral("labelMarcoInicial_2"));
+        labelMarcoInicial_2->setGeometry(QRect(320, 40, 111, 21));
+        labelMarcoInicial_2->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
+        labelMarcoInicial_2->setFrameShape(QFrame::Panel);
+        labelMarcoInicial_2->setFrameShadow(QFrame::Plain);
+        labelMarcoInicial_2->setLineWidth(1);
         frameBase = new QFrame(centralWidget);
         frameBase->setObjectName(QStringLiteral("frameBase"));
-        frameBase->setGeometry(QRect(210, 40, 541, 551));
+        frameBase->setGeometry(QRect(210, 40, 541, 591));
         frameBase->setFrameShape(QFrame::Panel);
         frameBase->setFrameShadow(QFrame::Sunken);
         frameBase->setMidLineWidth(0);
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(10, 40, 191, 401));
+        groupBox->setGeometry(QRect(10, 34, 191, 601));
         frame_2 = new QFrame(groupBox);
         frame_2->setObjectName(QStringLiteral("frame_2"));
-        frame_2->setGeometry(QRect(10, 20, 171, 371));
+        frame_2->setGeometry(QRect(10, 20, 171, 571));
         frame_2->setFrameShape(QFrame::Panel);
         frame_2->setFrameShadow(QFrame::Sunken);
-        layoutWidget2 = new QWidget(frame_2);
-        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
-        layoutWidget2->setGeometry(QRect(20, 20, 133, 341));
-        verticalLayout = new QVBoxLayout(layoutWidget2);
+        layoutWidget1 = new QWidget(frame_2);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(10, 30, 151, 511));
+        verticalLayout = new QVBoxLayout(layoutWidget1);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        pushButtonPonte = new QPushButton(layoutWidget2);
-        pushButtonPonte->setObjectName(QStringLiteral("pushButtonPonte"));
+        pushButtonInicioSb = new QPushButton(layoutWidget1);
+        pushButtonInicioSb->setObjectName(QStringLiteral("pushButtonInicioSb"));
 
-        verticalLayout->addWidget(pushButtonPonte);
+        verticalLayout->addWidget(pushButtonInicioSb);
 
-        pushButtonTunel = new QPushButton(layoutWidget2);
+        pushButtonFimSb = new QPushButton(layoutWidget1);
+        pushButtonFimSb->setObjectName(QStringLiteral("pushButtonFimSb"));
+
+        verticalLayout->addWidget(pushButtonFimSb);
+
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_3);
+
+        pushButtonTunel = new QPushButton(layoutWidget1);
         pushButtonTunel->setObjectName(QStringLiteral("pushButtonTunel"));
 
         verticalLayout->addWidget(pushButtonTunel);
 
-        pushButtonPN = new QPushButton(layoutWidget2);
+        pushButtonTunel_2 = new QPushButton(layoutWidget1);
+        pushButtonTunel_2->setObjectName(QStringLiteral("pushButtonTunel_2"));
+
+        verticalLayout->addWidget(pushButtonTunel_2);
+
+        verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_4);
+
+        pushButtonPonte = new QPushButton(layoutWidget1);
+        pushButtonPonte->setObjectName(QStringLiteral("pushButtonPonte"));
+        pushButtonPonte->setCheckable(false);
+        pushButtonPonte->setChecked(false);
+
+        verticalLayout->addWidget(pushButtonPonte);
+
+        pushButtonPonte_2 = new QPushButton(layoutWidget1);
+        pushButtonPonte_2->setObjectName(QStringLiteral("pushButtonPonte_2"));
+        pushButtonPonte_2->setCheckable(false);
+        pushButtonPonte_2->setChecked(false);
+
+        verticalLayout->addWidget(pushButtonPonte_2);
+
+        verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_5);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer);
+
+        pushButtonPN = new QPushButton(layoutWidget1);
         pushButtonPN->setObjectName(QStringLiteral("pushButtonPN"));
 
         verticalLayout->addWidget(pushButtonPN);
 
-        pushButton_7 = new QPushButton(layoutWidget2);
-        pushButton_7->setObjectName(QStringLiteral("pushButton_7"));
+        verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        verticalLayout->addWidget(pushButton_7);
+        verticalLayout->addItem(verticalSpacer_6);
 
-        pushButton_5 = new QPushButton(layoutWidget2);
-        pushButton_5->setObjectName(QStringLiteral("pushButton_5"));
+        pushButtonMarco = new QPushButton(layoutWidget1);
+        pushButtonMarco->setObjectName(QStringLiteral("pushButtonMarco"));
 
-        verticalLayout->addWidget(pushButton_5);
+        verticalLayout->addWidget(pushButtonMarco);
+
+        verticalSpacer_7 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_7);
+
+        pushButtonUsuario = new QPushButton(layoutWidget1);
+        pushButtonUsuario->setObjectName(QStringLiteral("pushButtonUsuario"));
+
+        verticalLayout->addWidget(pushButtonUsuario);
 
         frame_5 = new QFrame(centralWidget);
         frame_5->setObjectName(QStringLiteral("frame_5"));
@@ -295,34 +309,34 @@ public:
         lcdNumber->setFrameShadow(QFrame::Sunken);
         frame_7 = new QFrame(centralWidget);
         frame_7->setObjectName(QStringLiteral("frame_7"));
-        frame_7->setGeometry(QRect(759, 250, 501, 191));
+        frame_7->setGeometry(QRect(760, 240, 501, 191));
         frame_7->setFrameShape(QFrame::Panel);
         frame_7->setFrameShadow(QFrame::Raised);
         frame_4 = new QFrame(frame_7);
         frame_4->setObjectName(QStringLiteral("frame_4"));
-        frame_4->setGeometry(QRect(70, 50, 381, 121));
+        frame_4->setGeometry(QRect(10, 50, 481, 121));
         frame_4->setLayoutDirection(Qt::LeftToRight);
         frame_4->setAutoFillBackground(true);
         frame_4->setFrameShape(QFrame::Panel);
         frame_4->setFrameShadow(QFrame::Sunken);
         widget_3 = new QWidget(frame_4);
         widget_3->setObjectName(QStringLiteral("widget_3"));
-        widget_3->setGeometry(QRect(181, 30, 101, 71));
+        widget_3->setGeometry(QRect(230, 30, 101, 71));
         widget_3->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 0);"));
         frame_6 = new QFrame(frame_4);
         frame_6->setObjectName(QStringLiteral("frame_6"));
-        frame_6->setGeometry(QRect(280, 30, 91, 71));
+        frame_6->setGeometry(QRect(329, 30, 91, 71));
         frame_6->setStyleSheet(QStringLiteral("background-color: rgb(0, 255, 0);"));
         frame_6->setFrameShape(QFrame::StyledPanel);
         frame_6->setFrameShadow(QFrame::Raised);
         widget_4 = new QWidget(frame_4);
         widget_4->setObjectName(QStringLiteral("widget_4"));
-        widget_4->setGeometry(QRect(11, 30, 171, 71));
+        widget_4->setGeometry(QRect(60, 30, 171, 71));
         widget_4->setStyleSheet(QStringLiteral("background-color: rgb(255, 0, 0);"));
         horizontalSliderHdop = new QSlider(frame_4);
         horizontalSliderHdop->setObjectName(QStringLiteral("horizontalSliderHdop"));
         horizontalSliderHdop->setEnabled(false);
-        horizontalSliderHdop->setGeometry(QRect(10, 20, 361, 91));
+        horizontalSliderHdop->setGeometry(QRect(60, 20, 361, 91));
         horizontalSliderHdop->setMinimum(0);
         horizontalSliderHdop->setValue(0);
         horizontalSliderHdop->setSliderPosition(0);
@@ -333,6 +347,9 @@ public:
         label_4 = new QLabel(frame_7);
         label_4->setObjectName(QStringLiteral("label_4"));
         label_4->setGeometry(QRect(10, 20, 46, 13));
+        pushButton = new QPushButton(centralWidget);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setGeometry(QRect(130, 0, 75, 23));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -374,17 +391,21 @@ public:
         );
         label_2->setText(QApplication::translate("MainWindow", "Interface Serial", 0));
         labelMarcoInicial->setText(QString());
+        label_6->setText(QApplication::translate("MainWindow", "Marco Atual", 0));
+        labelMarcoInicial_2->setText(QString());
+        groupBox->setTitle(QApplication::translate("MainWindow", "Pontos Not\303\241veis", 0));
         pushButtonInicioSb->setText(QApplication::translate("MainWindow", "INICIO DE SB", 0));
         pushButtonFimSb->setText(QApplication::translate("MainWindow", "FIM DE SB", 0));
+        pushButtonTunel->setText(QApplication::translate("MainWindow", "INICIO DE TUNEL", 0));
+        pushButtonTunel_2->setText(QApplication::translate("MainWindow", "FIM DE TUNEL", 0));
+        pushButtonPonte->setText(QApplication::translate("MainWindow", "INICIO DE PONTE", 0));
+        pushButtonPonte_2->setText(QApplication::translate("MainWindow", "FIM DE PONTE", 0));
+        pushButtonPN->setText(QApplication::translate("MainWindow", "PASSAGEM DE NIVEL", 0));
         pushButtonMarco->setText(QApplication::translate("MainWindow", "MARCO", 0));
-        groupBox->setTitle(QApplication::translate("MainWindow", "Pontos Not\303\241veis (sem edi\303\247\303\243o)", 0));
-        pushButtonPonte->setText(QApplication::translate("MainWindow", "PONTE [F1]", 0));
-        pushButtonTunel->setText(QApplication::translate("MainWindow", "TUNEL [F2]", 0));
-        pushButtonPN->setText(QApplication::translate("MainWindow", "PASSAGEM DE NIVEL [F3]", 0));
-        pushButton_7->setText(QApplication::translate("MainWindow", "DEFINIDO USUARIO 1", 0));
-        pushButton_5->setText(QApplication::translate("MainWindow", "DEFINIDO USUARIO 2", 0));
+        pushButtonUsuario->setText(QApplication::translate("MainWindow", "DEFINIDO PELO USU\303\201RIO", 0));
         label_3->setText(QApplication::translate("MainWindow", "VELOCIDADE (KM/H)", 0));
         label_4->setText(QApplication::translate("MainWindow", "HDOP", 0));
+        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
     } // retranslateUi
 
 };

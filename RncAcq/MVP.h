@@ -66,7 +66,7 @@ public:
 		mmodel->ModelTerminarCaptura();
 	};
 
-	virtual void ProcessaPN(PN_TIPO pn)
+	virtual void ProcessaPN(PN_DATA pn)
 	{
 		mmodel->ModelProcessaPN(pn);
 	};

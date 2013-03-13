@@ -124,7 +124,7 @@ bool Model::ModoGravacao()
 	return mmodoGravacao;
 }
 
-void Model::ModelProcessaPN(PN_TIPO pn)
+void Model::ModelProcessaPN(PN_DATA pn)
 {
 	((CtrlPontosNotaveis*)mctrlPN)->ProcessaPN(pn);
 }

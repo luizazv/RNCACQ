@@ -54,7 +54,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\chrono\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\thread\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\regex\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\date_time\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\system\build\msvc-10.0\debug\link-static\threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\timer\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\chrono\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\thread\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\regex\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\date_time\build\msvc-10.0\debug\link-static\threading-multi;C:\Dados\Projetos Daiken\boost_1_53_0\bin.v2\libs\system\build\msvc-10.0\debug\link-static\threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>C:\Qt\Qt5.0.1\5.0.1\msvc2010\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -79,6 +79,10 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\RncAcqGui\dialogabrirsb.h" />
+    <ClInclude Include="..\RncAcqGui\dialogdefinidousuario.h" />
+    <ClInclude Include="..\RncAcqGui\dialogfecharsb.h" />
+    <ClInclude Include="..\RncAcqGui\dialogmarco.h" />
     <ClInclude Include="..\RncAcqGui\mainwindow.h" />
     <ClInclude Include="CtrlBD.h" />
     <ClInclude Include="CtrlCoordenadas.h" />
@@ -95,8 +99,14 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogabrirsb.cpp" />
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogdefinidousuario.cpp" />
+    <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogfecharsb.cpp" />
     <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_dialogmarco.cpp" />
     <ClCompile Include="..\RncAcqGui-build-Desktop_Qt_5_0_1_MSVC2010_32bit-Debug\debug\moc_mainwindow.cpp" />
+    <ClCompile Include="..\RncAcqGui\dialogabrirsb.cpp" />
+    <ClCompile Include="..\RncAcqGui\dialogdefinidousuario.cpp" />
+    <ClCompile Include="..\RncAcqGui\dialogfecharsb.cpp" />
     <ClCompile Include="..\RncAcqGui\dialogmarco.cpp" />
     <ClCompile Include="..\RncAcqGui\main.cpp" />
     <ClCompile Include="..\RncAcqGui\mainwindow.cpp" />
