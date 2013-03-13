@@ -7,6 +7,7 @@
 #include <string>
 #include <QtWidgets\QMessageBox>
 #include <QtCore\QTimer>
+#include <algorithm>
 
 #include "c:/dados/projetos daiken/rncacq/rncacq/MVP.h"
 #include "c:/dados/projetos daiken/rncacq/rncacq/Model.h"
@@ -20,6 +21,16 @@ std::vector< int > xy;
 
 class FrameNav : public QFrame
 {
+private:
+    struct COORDENADAS
+    {
+        int latitude;
+        int longitude;
+    };
+
+    vector <COORDENADAS> vecCoord;
+
+
 public:
     FrameNav(QWidget *t) : QFrame(t)
     {
@@ -50,6 +61,51 @@ public:
     }
 
 
+    static bool ComparaLatitudeMaior(COORDENADAS coord1, COORDENADAS coord2)
+    {
+       bool retval = (coord1.latitude > coord2.latitude);
+       return retval;
+    }
+
+    static bool ComparaLongitudeMaior(COORDENADAS coord1, COORDENADAS coord2)
+    {
+       bool retval = (coord1.longitude > coord2.longitude);
+       return retval;
+    }
+
+    static bool ComparaLatitudeMenor(COORDENADAS coord1, COORDENADAS coord2)
+    {
+       bool retval = (coord1.latitude < coord2.latitude);
+       return retval;
+    }
+
+    static bool ComparaLongitudeMenor(COORDENADAS coord1, COORDENADAS coord2)
+    {
+       bool retval = (coord1.longitude < coord2.longitude);
+       return retval;
+    }
+
+    void AddPontos(int latitude, int longitude)
+    {
+        vector <COORDENADAS>::iterator itLatitudeMaior;
+        vector <COORDENADAS>::iterator itLongitudeMaior;
+        vector <COORDENADAS>::iterator itLatitudeMenor;
+        vector <COORDENADAS>::iterator itLongitudeMenor;
+
+        //encontro maior longitude e menor longitude->tentativa de manter a imagem no meio
+        itLatitudeMaior = max_element(vecCoord.begin(), vecCoord.end(), ComparaLatitudeMaior);
+        itLongitudeMaior = max_element(vecCoord.begin(), vecCoord.end(), ComparaLongitudeMaior);
+
+        itLatitudeMenor = min_element(vecCoord.begin(), vecCoord.end(), ComparaLatitudeMenor);
+        itLongitudeMenor = min_element(vecCoord.begin(), vecCoord.end(), ComparaLongitudeMenor);
+
+        //delta entre latitudes
+        int latdelta = (*itLatitudeMaior).latitude - (*itLatitudeMenor).latitude;
+        int longdelta = (*itLongitudeMaior).longitude - (*itLongitudeMenor).longitude;
+
+        //latitude menor no canto inferior esquerdo + 10 pixels
+    }
+
 };
 
 FrameNav *frameNav;
@@ -61,30 +117,12 @@ MainWindow::MainWindow(QWidget *parent) :
     setupUi(this);
 
     frameNav = new FrameNav(frameBase);
-    frameNav->setGeometry(50, 50, 100, 100);
+//    frameNav->setGeometry(50, 50, 100, 100);
+//    QRect rect = frameBase
+    frameNav->setGeometry(frameBase->geometry());
     frameNav->setFrameShape(QFrame::NoFrame);
     frameNav->setFrameShadow(QFrame::Sunken);
 
-}
-
-void MainWindow::on_ButtonRec_clicked()
-{
-    DialogMarco d;
-
-    if(d.exec() == 1)
-    {
-        labelMarcoInicial->setText(d.GetMarco());
-        //valor aceito
-        ButtonStop->setEnabled(true);
-        ButtonRec->setEnabled(false);
-        ButtonPause->setEnabled(true);
-        ButtonIniciar->setEnabled(false);
-        mpresenter->IniciarCaptura();
-    }
-    else
-    {
-        QMessageBox::information(NULL, "Erro", "Faltou Entrar com Marco Inicial");
-    }
 }
 
 void MainWindow::SentencaOk()
@@ -97,13 +135,9 @@ void MainWindow::SentencaOk()
 	}
 
 	if(ButtonStop->isEnabled() == false ||
-		ButtonRec->isEnabled() == false ||
-		ButtonPause->isEnabled() == false ||
         ButtonIniciar->isEnabled() == true)
 	{
 		ButtonStop->setEnabled(true);
-		ButtonRec->setEnabled(true);
-		ButtonPause->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
 }
@@ -118,13 +152,9 @@ void MainWindow::ErroGpsSentencaInvalida()
 	}
 
     if(ButtonStop->isEnabled() == false ||
-		ButtonRec->isEnabled() == true ||
-		ButtonPause->isEnabled() == true ||
         ButtonIniciar->isEnabled() == true)
 	{
 		ButtonStop->setEnabled(true);
-		ButtonRec->setEnabled(false);
-		ButtonPause->setEnabled(false);
 		ButtonIniciar->setEnabled(false);
 	}
 }
@@ -139,13 +169,9 @@ void MainWindow::ErroGpsFalhaSentenca()
 	}
 
 	if(ButtonStop->isEnabled() == true ||
-		ButtonRec->isEnabled() == true ||
-		ButtonPause->isEnabled() == true ||
         ButtonIniciar->isEnabled() == true)
 	{
-		ButtonStop->setEnabled(false);
-		ButtonRec->setEnabled(false);
-		ButtonPause->setEnabled(false);
+		ButtonStop->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
 }
@@ -160,13 +186,9 @@ void MainWindow::ErroGps()
 	}
 
 	if(ButtonStop->isEnabled() == true ||
-		ButtonRec->isEnabled() == true ||
-		ButtonPause->isEnabled() == true ||
         ButtonIniciar->isEnabled() == false)
 	{
 		ButtonStop->setEnabled(false);
-		ButtonRec->setEnabled(false);
-		ButtonPause->setEnabled(false);
 		ButtonIniciar->setEnabled(true);
 	}
 }
@@ -176,29 +198,55 @@ void MainWindow::SetHdop(int valor)
 	horizontalSliderHdop->setValue(valor);
 }
 
-void MainWindow::SendMsg(const char *msg)
+
+static QMessageBox *mbox = NULL;
+
+void MainWindow::SendMsg(const char *msg, int timer)
 {
-//	QMessageBox::information(NULL, "ATENCAO", msg);
+	//timer = 0->sem temporização, botão ok necessario
+	mbox = new QMessageBox(this);
 
-    QMessageBox *mbox = new QMessageBox;
-    mbox->setWindowTitle("ATENCAO");
-    mbox->setText(msg);
-    mbox->show();
-	QTimer::singleShot(5000, mbox, SLOT(hide()));
+	if(timer == 0)
+	{
+		//timer = tempo em milisegundos
+		mbox->setWindowTitle("ATENCAO");
+		mbox->setText(msg);
+		mbox->setStandardButtons(QMessageBox::Ok);
+	}
+	else
+	{
+		mbox = new QMessageBox(this);
+
+		//timer = tempo em milisegundos
+		QTimer::singleShot(timer, mbox, SLOT(hide()));
+		mbox->setWindowTitle("ATENCAO");
+		mbox->setText(msg);
+		mbox->setStandardButtons(QMessageBox::NoButton);
+	}
+
+	mbox->show();
 }
-
 
 void MainWindow::on_ButtonIniciar_clicked()
 {
-    //inicia thread GPS
-    ButtonStop->setEnabled(false);
-    ButtonRec->setEnabled(false);
-    ButtonPause->setEnabled(false);
-    ButtonIniciar->setEnabled(false);
+    DialogMarco d;
 
-    string strSerial = comboBoxSerial->currentText().toLocal8Bit();
+    if(d.exec() == 1)
+    {
+        labelMarcoInicial->setText(d.GetMarco());
+        //valor aceito
+        //inicia thread GPS
+        ButtonStop->setEnabled(true);
+        ButtonIniciar->setEnabled(false);
 
-    mpresenter->IniciaGps(strSerial);
+        string strSerial = comboBoxSerial->currentText().toLocal8Bit();
+
+        mpresenter->IniciaGps(strSerial);
+    }
+    else
+    {
+        QMessageBox::information(NULL, "Erro", "Faltou Entrar com Marco Inicial");
+    }
 }
 
 void MainWindow::on_ButtonStop_clicked()
@@ -207,9 +255,6 @@ void MainWindow::on_ButtonStop_clicked()
     mpresenter->TerminarCaptura();
 
     ButtonIniciar->setEnabled(true);
-    ButtonPause->setEnabled(false);
-    ButtonRec->setEnabled(false);
-    ButtonPause->setEnabled(false);
 }
 
 void MainWindow::on_pushButtonPonte_clicked()
@@ -268,8 +313,9 @@ void MainWindow::on_pushButtonInicioSb_clicked()
         //valida e envia para controle de pontos notaveis
 		PN_DATA pn;
 
-		pn.Marco = dialogAbrir.Marco();
-		pn.Sb = dialogAbrir.Sb();
+		pn.pntipo = PN_INICIOSB;
+		pn.Marco = dialogAbrir.Marco().toLocal8Bit();
+		pn.Sb = dialogAbrir.Sb().toLocal8Bit();
 
 		//select = true-> um dos elementos foi selecionado
 		bool select = dialogAbrir.SelecaoInicio(pn.pntipoinicio);
@@ -303,13 +349,16 @@ void MainWindow::on_pushButtonFimSb_clicked()
 {
     DialogFecharSB dialogFechar;
 
+	dialogFechar.CarregaSbAberta(ListaSbsAbertas);
+
     if(dialogFechar.exec() == 1)
     {
         //dados ok->valida e envia para controle de pontos notaveis
         //valida e envia para controle de pontos notaveis
         PN_DATA pn;
 
-        pn.Sb = dialogFechar.SbParaFechar();
+		pn.pntipo = PN_FIMSB;
+		pn.Sb = dialogFechar.SbParaFechar().toLocal8Bit();
 
         //select = true-> um dos elementos foi selecionado
 		bool select = dialogFechar.SelecaoChave(pn.pnchave);
@@ -357,11 +406,4 @@ void MainWindow::on_pushButtonUsuario_clicked()
 
     }
 
-}
-
-
-
-void MainWindow::on_pushButton_clicked()
-{
-    frameNav->repaint();
 }

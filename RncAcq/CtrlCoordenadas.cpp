@@ -10,15 +10,12 @@ CtrlCoordenadas::CtrlCoordenadas(Model *model)
 {
 	mmodel = model;
 	//abre queue message do GPS para receber dados de GPS
-//	mGpsQueue.InitConsumidor(NOME_CTRL_COORDENADAS_QUEUE);
+	mgpsQueue.InitConsumidor(NOME_CTRL_COORDENADAS_QUEUE);
+
+	mThread = boost::thread(Thread, this);
 }
 
 //---------------------------------------------------------------------------
-void CtrlCoordenadas::SentencaGps(string sentenca)
-{
-
-}
-
 void CtrlCoordenadas::GetCoordenadas(COORDENADAS &dados)
 {
 	//não necessita sincronismo->as chamadas são em sequencia pelo
@@ -59,17 +56,35 @@ bool CtrlCoordenadas::RecebeDadosGps()
 	bool retval = false;
 
 	//verifica se chegou algo no message queue do GPS
-//	if(mGpsQueue.Receive(&mgpsData))
+	message_queue mq(open_only, NOME_CTRL_COORDENADAS_QUEUE);
+
+	size_t recvdSize;
+	unsigned int prioridade;
+
+	try
+	{
+		mq.receive(&mgpsData, sizeof(GPSDATA), recvdSize, prioridade);
+
+		if(recvdSize > 0)
+		{
+			retval = true;
+		}
+	}
+	catch(...)
+	{
+		retval = false;
+	}
+
+	return retval;
+
+
+/*
+	if(mgpsQueue.Receive(&mgpsData))
 	{
 		retval = true;
 	}
 
-	return retval;
-}
-
-void CtrlCoordenadas::Executa()
-{
-	mThread = boost::thread(Thread, this);  
+	return retval;*/
 }
 
 //---------------------------------------------------------------------------------

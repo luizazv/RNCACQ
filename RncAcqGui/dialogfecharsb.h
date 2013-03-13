@@ -15,7 +15,7 @@ public:
 
 	void CarregaSbAberta(std::vector < std::string> Sbs);
 
-	std::string SbParaFechar();
+	QString SbParaFechar();
 
 	bool SelecaoChave(PN_CHAVE &pntipo);
 

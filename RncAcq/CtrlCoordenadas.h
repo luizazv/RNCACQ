@@ -23,22 +23,21 @@ class CtrlCoordenadas : public Subject
 {
 private:
 	//queue message entre CtrlCoordenadas e GPS (recebe dados GPS)
-//	QueueMgr mGpsQueue;
+	QueueMgr mgpsQueue;
 	GPSDATA mgpsData;
 	boost::thread mThread;
 	COORDENADAS mdadosCoordenadas;
 	Model *mmodel;
 
 	void ExecutaProcessamento();
-	void SentencaGps(string sentenca);
 	bool RecebeDadosGps();
+	void Run();
 
 public:
 	CtrlCoordenadas(Model *model);
 
-	void Executa();
 	void static Thread(CtrlCoordenadas *p);
-	void Run();
+
 	void GetCoordenadas(COORDENADAS &dados);
 
 };

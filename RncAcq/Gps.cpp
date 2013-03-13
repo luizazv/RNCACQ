@@ -4,6 +4,8 @@
 #include "Gps.h"
 #include "LogMgr.h"
 
+ boost::scoped_ptr<message_queue> mq;
+
 //----------------------------------------------------------------------------------
 Gps::Gps(Model *model)
 {
@@ -16,6 +18,11 @@ Gps::Gps(Model *model)
 	mEstado = 0;
 	mterminaThread = false;
 	mtolerancia = 0;
+
+	message_queue::remove(NOME_CTRL_COORDENADAS_QUEUE);
+	mq.reset(new message_queue(create_only, NOME_CTRL_COORDENADAS_QUEUE, 4, sizeof(GPSDATA)));
+//	mgpsQueue.InitProdutor(1000, NOME_CTRL_COORDENADAS_QUEUE);
+
 }
 
 //---------------------------------------------------------------------------------
@@ -453,7 +460,6 @@ bool Gps::VerificaSentenca()
 		if ( ParserRMC() )
 		{
 			mgpsData.ParserRMC = true;	
-			mmodel->SendMsg(mSentenca.c_str());
 		}
 	}
 	else if(mSentenca.find("$GPGGA") != string::npos)
@@ -464,24 +470,20 @@ bool Gps::VerificaSentenca()
 		if ( ParserGGA() )
 		{
 			mgpsData.ParserGGA = true;
-			mmodel->SendMsg(mSentenca.c_str());
 		}
 	}
 	else if( mSentenca.find("$GPGSA") != string::npos)
 	{
-		// Executa o Parser do pacote GGA.
-		mmodel->SendMsg(mSentenca.c_str());
+		// Executa o Parser do pacote GSA.
 	}
 	else if( mSentenca.find("$GPGSV") != string::npos)
 	{
 		//IGNORA SENTENÇA
-		mmodel->SendMsg("");
 	}
 	else if( mSentenca.find("$PGRMO") != string::npos)
 	{
 		//IGNORA SENTENÇA
 		//GPRMO É SENTENÇA DE CONFIRMAÇÃO DE CONFIGURAÇÃO
-		mmodel->SendMsg("");
 	}
 
 	//retorna estrutura apenas se PRMC & GGA foram lidas
@@ -541,9 +543,18 @@ bool Gps::VerificaSerialAtiva()
 //---------------------------------------------------------------------------------
 void Gps::EnviaParaCtrlCoordenadas()
 {
+//	message_queue::remove(NOME_CTRL_COORDENADAS_QUEUE);
+	try
+	{
+		mq->send((const char *)&mgpsData, sizeof(GPSDATA), 0);
+	}
+	catch(...)
+	{
+//		message_queue::remove(NOME_CTRL_COORDENADAS_QUEUE);
+	}
 
 	//envia dados para CtrlCoordenadas via message_queue
-//	mctrlCoordenadasQueue.Send(reinterpret_cast <const char *> (&mgpsData));
+//	mgpsQueue.Send((const char *)(&mgpsData));
 }
 
 //---------------------------------------------------------------------------------
@@ -615,11 +626,7 @@ void Gps::Run()
 				if( LeSentenca() == true )
 				{
 					//grava sentenca no log-> se estiver em modo gravação
-
-					if(mmodel->ModoGravacao())
-					{
-						GravaLog();
-					}
+					GravaLog();
 
 					//verifica se recebeu as sentencas esperadas e aciona os ícones
 					ProcessaSentenca();
@@ -635,7 +642,7 @@ void Gps::Run()
 			}
 
 			//delay loop principal da thread
-			boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+			boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 		}
 		else
 		{
@@ -647,7 +654,5 @@ void Gps::Run()
 	mmodel->ErroGps();
 	mmodel->SetHdop(HDOP_FIMESCALA);
 	mSerial.close();
-	mmodel->SendMsg("");
-
 }
 

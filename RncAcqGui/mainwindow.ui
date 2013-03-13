@@ -94,9 +94,9 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>50</x>
         <y>10</y>
-        <width>341</width>
+        <width>301</width>
         <height>68</height>
        </rect>
       </property>
@@ -125,55 +125,6 @@
         <widget class="QToolButton" name="ButtonIniciar">
          <property name="text">
           <string>PAUSE</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../Imagens/Iniciar.bmp</normaloff>../Imagens/Iniciar.bmp</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>60</width>
-           <height>60</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="ButtonPause">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>PAUSE</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../Imagens/botaoPause.bmp</normaloff>../Imagens/botaoPause.bmp</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>60</width>
-           <height>60</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="ButtonRec">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="acceptDrops">
-          <bool>false</bool>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>GRAVAR</string>
          </property>
          <property name="icon">
           <iconset>
@@ -743,19 +694,6 @@
       <string>HDOP</string>
      </property>
     </widget>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>0</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

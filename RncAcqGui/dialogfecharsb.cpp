@@ -6,9 +6,9 @@ DialogFecharSB::DialogFecharSB(QWidget *parent) :
     setupUi(this);
 }
 
-std::string DialogFecharSB::SbParaFechar()
+QString DialogFecharSB::SbParaFechar()
 {
-	return comboBox->currentText().toStdString();
+	return comboBox->currentText();
 }
 
 bool DialogFecharSB::SelecaoChave(PN_CHAVE &pntipo)

@@ -142,6 +142,7 @@ void LogMgr::Run()
 		}
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+
 	}
 }
 

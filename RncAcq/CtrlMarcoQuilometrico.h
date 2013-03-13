@@ -6,6 +6,7 @@
 #include <string>
 #include "Observer.h"
 #include "CtrlCoordenadas.h"
+#include "Model.h"
 
 using namespace std;
 
@@ -37,6 +38,7 @@ class CtrlMarcoQuilometrico : public Observer
 private:
 	MARCO multimoMarco;
 	MARCO mmarcoInicial;
+	Model *mmodel;
 
 	COORDENADAS mcoordenadaAnterior;
 	COORDENADAS mcoordenadaAtual;
@@ -52,7 +54,7 @@ private:
 	void GetCoordenadas(COORDENADAS &dados);
 
 public:
-	CtrlMarcoQuilometrico();
+	CtrlMarcoQuilometrico(Model *model);
 	
 	void Notify(Subject *p);
 	void EventoSalvarMarcoManual();

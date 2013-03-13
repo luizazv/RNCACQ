@@ -3,7 +3,6 @@
 
 #include "ui_dialogabrirsb.h"
 #include "c:/dados/projetos daiken/rncacq/rncacq/Model.h"
-#include <string>
 
 class DialogAbrirSB : public QDialog, private Ui::DialogAbrirSB
 {
@@ -15,11 +14,11 @@ public:
 	bool SelecaoSentido(PN_SENTIDO &pntipo);
 	bool SelecaoInicio(PN_INICIOTIPO &pntipo);
 	bool SelecaoDesvio(PN_DESVIO &pntipo);
-	std::string Marco();
-	std::string Sb();
+	QString Marco();
+	QString Sb();
 
 private slots:
-    void on_lineEdit_textChanged(const QString &arg1);
+    void on_lineEditSb_textChanged(const QString &arg1);
 };
 
 #endif // DIALOGABRIRSB_H

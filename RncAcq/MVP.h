@@ -25,7 +25,7 @@ public:
 	virtual void SentencaOk() = 0;
 	virtual void ErroGps() = 0;
 	virtual void SetHdop(int valor) = 0;
-	virtual void SendMsg(const char *msg) = 0;
+	virtual void SendMsg(const char *msg, int timer) = 0;
 };
 
 
@@ -52,15 +52,6 @@ public:
 		mmodel->ModelIniciaGps(InterfaceSerial);
 	};
 
-	virtual void IniciarCaptura()
-	{
-		mmodel->ModelIniciarCaptura();
-	};
-
-	virtual void PausarCaptura()
-	{
-		mmodel->ModelPausarCaptura();
-	};
 	virtual void TerminarCaptura()
 	{
 		mmodel->ModelTerminarCaptura();

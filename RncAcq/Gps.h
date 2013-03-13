@@ -88,8 +88,7 @@ private:
 	Serial mSerial;
 	std::string mSentenca;
 	Model *mmodel;
-//	QueueMgr mgpsQueue;
-//	QueueMgr mctrlCoordenadasQueue;
+	QueueMgr mgpsQueue;
 	boost::thread mThread;
 	void *mIdLog;
 	bool mterminaThread;

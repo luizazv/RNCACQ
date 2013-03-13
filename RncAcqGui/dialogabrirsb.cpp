@@ -7,7 +7,7 @@ DialogAbrirSB::DialogAbrirSB(QWidget *parent) :
     setupUi(this);
 }
 
-void DialogAbrirSB::on_lineEdit_textChanged(const QString &arg1)
+void DialogAbrirSB::on_lineEditSb_textChanged(const QString &arg1)
 {
     QLineEdit *le = qobject_cast<QLineEdit *>(sender());
     if (!le)
@@ -52,14 +52,14 @@ bool DialogAbrirSB::SelecaoDesvio(PN_DESVIO &pntipo)
 
 }
 
-std::string DialogAbrirSB::Marco()
+QString DialogAbrirSB::Marco()
 {
-    return lineEditMarco->text().toStdString();
+    return lineEditMarco->text();
 }
 
-std::string DialogAbrirSB::Sb()
+QString DialogAbrirSB::Sb()
 {
-    return lineEditSb->text().toStdString();
+    return lineEditSb->text();
 }
 
 

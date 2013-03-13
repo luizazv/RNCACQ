@@ -5,6 +5,7 @@
 #include "LogMgr.h"
 #include "CtrlCoordenadas.h"
 #include "CtrlPontosNotaveis.h"
+#include "CtrlMarcoQuilometrico.h"
 
 //-----------------------------------------------------------------------------
 Model::Model(IView *view)
@@ -14,7 +15,10 @@ Model::Model(IView *view)
 	mlogmgr = LogMgr::GetInstance();
 	mctrlCoord = new CtrlCoordenadas(this);
 	mctrlPN = new CtrlPontosNotaveis(this);
-	mmodoGravacao = false;
+	mctrlMQ = new CtrlMarcoQuilometrico(this);
+	//registra os observers de controle coordenadas
+	((CtrlCoordenadas *)mctrlCoord)->RegisterObserver((Observer *)mctrlPN);
+	((CtrlCoordenadas *)mctrlCoord)->RegisterObserver((Observer *)mctrlMQ);
 }
 
 //-----------------------------------------------------------------------------
@@ -41,11 +45,6 @@ void Model::ModelIniciaGps(std::string InterfaceSerial)
 		((Gps *)mgps)->Inicia(com);
 	}
 
-}
-
-void Model::ModelIniciarCaptura()
-{
-	mmodoGravacao = true;
 }
 
 void Model::ModelPausarCaptura()
@@ -114,14 +113,9 @@ void Model::SetHdop(float valor)
 	mview->SetHdop(y);
 }
 
-void Model::SendMsg(const char *msg)
+void Model::SendMsg(const char *msg, int timer)
 {
-	mview->SendMsg(msg);
-}
-
-bool Model::ModoGravacao()
-{
-	return mmodoGravacao;
+	mview->SendMsg(msg, timer);
 }
 
 void Model::ModelProcessaPN(PN_DATA pn)

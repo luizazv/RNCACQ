@@ -3,6 +3,9 @@
 
 #include <string>
 
+//tempo que deve aguardar parado para marcar o pontos (em segundos)
+#define TEMPO_LEITURA_DE_PONTO_NOTAVEL	20
+
 enum ModoGravacao
 {
 	MODO_PAUSADO,
@@ -67,8 +70,6 @@ class IModel
 {
 public:
 	virtual void ModelIniciaGps(std::string InterfaceSerial) {}
-	virtual void ModelIniciarCaptura() {}
-	virtual void ModelPausarCaptura() {}
 	virtual void ModelTerminarCaptura() {}
 	virtual void ModelProcessaPN(PN_DATA) {}
 };
@@ -80,16 +81,15 @@ private:
 	void *mlogmgr;
 	void *mctrlCoord;
 	void *mctrlPN;
+	void *mctrlMQ;
 	void *mgps;
 	IView *mview;
-	bool mmodoGravacao;
 
 public:
 	Model(IView *view);
 
 	//recebe da GUI
 	virtual void ModelIniciaGps(std::string InterfaceSerial);
-	virtual void ModelIniciarCaptura();
 	virtual void ModelPausarCaptura();
 	virtual void ModelTerminarCaptura();
 	virtual void ModelProcessaPN(PN_DATA pn);
@@ -102,7 +102,7 @@ public:
 	void SentencaOk();
 	void ErroGps();
 	void SetHdop(float valor);
-	void SendMsg(const char *msg);
+	void SendMsg(const char *msg, int timer = 0);
 
 
 };

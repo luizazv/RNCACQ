@@ -17,7 +17,7 @@ public:
 	void ErroGpsFalhaSentenca();
 	void ErroGpsSentencaInvalida();
 	void SetHdop(int valor);
-	void SendMsg(const char *msg);
+	void SendMsg(const char *msg, int timer = 0);
 
 private:
 	enum EstadoGPS
@@ -30,7 +30,6 @@ private:
 	std::vector< std::string > ListaSbsAbertas;
 
 private slots:
-	void on_ButtonRec_clicked();
     void on_ButtonIniciar_clicked();
     void on_ButtonStop_clicked();
     void on_pushButtonPonte_clicked();
@@ -42,7 +41,6 @@ private slots:
     void on_pushButtonUsuario_clicked();
     void on_pushButtonTunel_2_clicked();
     void on_pushButtonPonte_2_clicked();
-    void on_pushButton_clicked();
 };
 
 #endif // MAINWINDOW_H

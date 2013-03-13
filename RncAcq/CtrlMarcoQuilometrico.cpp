@@ -5,8 +5,9 @@
 
 
 //-----------------------------------------------------------------------------
-CtrlMarcoQuilometrico::CtrlMarcoQuilometrico()
+CtrlMarcoQuilometrico::CtrlMarcoQuilometrico(Model *model)
 {
+	mmodel = model;
 	mmarcoInicial.coordenada.latitude = 0;
 	mmarcoInicial.coordenada.longitude = 0;
 	mmarcoInicial.km = 0;

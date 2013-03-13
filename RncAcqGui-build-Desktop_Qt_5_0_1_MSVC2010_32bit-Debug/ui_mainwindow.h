@@ -45,8 +45,6 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QToolButton *ButtonStop;
     QToolButton *ButtonIniciar;
-    QToolButton *ButtonPause;
-    QToolButton *ButtonRec;
     QFrame *frame_9;
     QLabel *label;
     QComboBox *comboBoxSerial;
@@ -84,7 +82,6 @@ public:
     QWidget *widget_4;
     QSlider *horizontalSliderHdop;
     QLabel *label_4;
-    QPushButton *pushButton;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -120,7 +117,7 @@ public:
         label_5->setGeometry(QRect(390, 10, 71, 16));
         layoutWidget = new QWidget(frame_8);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 10, 341, 68));
+        layoutWidget->setGeometry(QRect(50, 10, 301, 68));
         horizontalLayout_2 = new QHBoxLayout(layoutWidget);
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
@@ -139,34 +136,11 @@ public:
         ButtonIniciar = new QToolButton(layoutWidget);
         ButtonIniciar->setObjectName(QStringLiteral("ButtonIniciar"));
         QIcon icon1;
-        icon1.addFile(QStringLiteral("../Imagens/Iniciar.bmp"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral("../Imagens/botaoGravar.bmp"), QSize(), QIcon::Normal, QIcon::Off);
         ButtonIniciar->setIcon(icon1);
         ButtonIniciar->setIconSize(QSize(60, 60));
 
         horizontalLayout_2->addWidget(ButtonIniciar);
-
-        ButtonPause = new QToolButton(layoutWidget);
-        ButtonPause->setObjectName(QStringLiteral("ButtonPause"));
-        ButtonPause->setEnabled(false);
-        QIcon icon2;
-        icon2.addFile(QStringLiteral("../Imagens/botaoPause.bmp"), QSize(), QIcon::Normal, QIcon::Off);
-        ButtonPause->setIcon(icon2);
-        ButtonPause->setIconSize(QSize(60, 60));
-
-        horizontalLayout_2->addWidget(ButtonPause);
-
-        ButtonRec = new QToolButton(layoutWidget);
-        ButtonRec->setObjectName(QStringLiteral("ButtonRec"));
-        ButtonRec->setEnabled(false);
-        ButtonRec->setAcceptDrops(false);
-        ButtonRec->setLayoutDirection(Qt::LeftToRight);
-        ButtonRec->setAutoFillBackground(false);
-        QIcon icon3;
-        icon3.addFile(QStringLiteral("../Imagens/botaoGravar.bmp"), QSize(), QIcon::Normal, QIcon::Off);
-        ButtonRec->setIcon(icon3);
-        ButtonRec->setIconSize(QSize(60, 60));
-
-        horizontalLayout_2->addWidget(ButtonRec);
 
         frame_9 = new QFrame(frame);
         frame_9->setObjectName(QStringLiteral("frame_9"));
@@ -347,9 +321,6 @@ public:
         label_4 = new QLabel(frame_7);
         label_4->setObjectName(QStringLiteral("label_4"));
         label_4->setGeometry(QRect(10, 20, 46, 13));
-        pushButton = new QPushButton(centralWidget);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(130, 0, 75, 23));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -373,8 +344,6 @@ public:
         label_5->setText(QApplication::translate("MainWindow", "Estado do GPS", 0));
         ButtonStop->setText(QApplication::translate("MainWindow", "PAUSE", 0));
         ButtonIniciar->setText(QApplication::translate("MainWindow", "PAUSE", 0));
-        ButtonPause->setText(QApplication::translate("MainWindow", "PAUSE", 0));
-        ButtonRec->setText(QApplication::translate("MainWindow", "GRAVAR", 0));
         label->setText(QApplication::translate("MainWindow", "Marco Inicial", 0));
         comboBoxSerial->clear();
         comboBoxSerial->insertItems(0, QStringList()
@@ -405,7 +374,6 @@ public:
         pushButtonUsuario->setText(QApplication::translate("MainWindow", "DEFINIDO PELO USU\303\201RIO", 0));
         label_3->setText(QApplication::translate("MainWindow", "VELOCIDADE (KM/H)", 0));
         label_4->setText(QApplication::translate("MainWindow", "HDOP", 0));
-        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
     } // retranslateUi
 
 };

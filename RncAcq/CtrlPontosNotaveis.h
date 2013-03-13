@@ -14,9 +14,15 @@ private:
 	COORDENADAS mgpsData;
 	PN_DATA mpnData;
 	bool mterminateThread;
+	boost::mutex gpsMutex;
+	bool mdadoGpsNovo;
 
 	void Run();
 	static void Thread(CtrlPontosNotaveis *);
+	void SetMarco();
+	void SetPassagemNivel();
+	COORDENADAS GetDadosGps();
+	void SetDadosGps(COORDENADAS data);
 
 public:
 	CtrlPontosNotaveis(Model *model);
@@ -24,15 +30,6 @@ public:
 
 	void Notify(Subject *p);
 };
-
-
-
-
-
-
-
-
-
 
 
 #endif
