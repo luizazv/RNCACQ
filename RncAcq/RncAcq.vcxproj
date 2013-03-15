@@ -83,6 +83,7 @@
     <ClInclude Include="..\RncAcqGui\dialogdefinidousuario.h" />
     <ClInclude Include="..\RncAcqGui\dialogfecharsb.h" />
     <ClInclude Include="..\RncAcqGui\dialogmarco.h" />
+    <ClInclude Include="..\RncAcqGui\framenav.h" />
     <ClInclude Include="..\RncAcqGui\mainwindow.h" />
     <ClInclude Include="CtrlBD.h" />
     <ClInclude Include="CtrlCoordenadas.h" />
@@ -108,6 +109,7 @@
     <ClCompile Include="..\RncAcqGui\dialogdefinidousuario.cpp" />
     <ClCompile Include="..\RncAcqGui\dialogfecharsb.cpp" />
     <ClCompile Include="..\RncAcqGui\dialogmarco.cpp" />
+    <ClCompile Include="..\RncAcqGui\framenav.cpp" />
     <ClCompile Include="..\RncAcqGui\main.cpp" />
     <ClCompile Include="..\RncAcqGui\mainwindow.cpp" />
     <ClCompile Include="CtrlBD.cpp" />

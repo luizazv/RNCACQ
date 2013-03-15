@@ -75,6 +75,9 @@
     <ClInclude Include="..\RncAcqGui\dialogmarco.h">
       <Filter>GuiQt</Filter>
     </ClInclude>
+    <ClInclude Include="..\RncAcqGui\framenav.h">
+      <Filter>GuiQt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CtrlCoordenadas.cpp">
@@ -138,6 +141,9 @@
       <Filter>GuiQt</Filter>
     </ClCompile>
     <ClCompile Include="..\RncAcqGui\dialogfecharsb.cpp">
+      <Filter>GuiQt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RncAcqGui\framenav.cpp">
       <Filter>GuiQt</Filter>
     </ClCompile>
   </ItemGroup>

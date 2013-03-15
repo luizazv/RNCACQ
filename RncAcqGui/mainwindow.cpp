@@ -3,22 +3,20 @@
 #include "dialogabrirsb.h"
 #include "dialogfecharsb.h"
 #include "dialogdefinidousuario.h"
+#include "framenav.h"
+
 #include <QtGui\QPainter>
 #include <string>
 #include <QtWidgets\QMessageBox>
 #include <QtCore\QTimer>
 #include <algorithm>
+#include <sstream>
 
 #include "c:/dados/projetos daiken/rncacq/rncacq/MVP.h"
 #include "c:/dados/projetos daiken/rncacq/rncacq/Model.h"
 
-int k = 150;
-int xp1 = 15;
-int yp1 = 20;
 
-std::vector< int > xp;
-std::vector< int > xy;
-
+/*
 class FrameNav : public QFrame
 {
 private:
@@ -107,6 +105,7 @@ public:
     }
 
 };
+*/
 
 FrameNav *frameNav;
 
@@ -117,12 +116,66 @@ MainWindow::MainWindow(QWidget *parent) :
     setupUi(this);
 
     frameNav = new FrameNav(frameBase);
-//    frameNav->setGeometry(50, 50, 100, 100);
-//    QRect rect = frameBase
     frameNav->setGeometry(frameBase->geometry());
     frameNav->setFrameShape(QFrame::NoFrame);
     frameNav->setFrameShadow(QFrame::Sunken);
 
+    mdistanciaUltimoMarco = 0;
+    mmarcoAtual = 0;
+}
+
+void MainWindow::AtivaBarraLeds()
+{
+    static int led = 0;
+    static bool direcao = true;
+
+    QPixmap px;
+
+    QPainter p(&px);
+
+    switch(led)
+    {
+        case 0:
+            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led1.bmp");
+        break;
+        case 1:
+            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led2.bmp");
+        break;
+        case 2:
+            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led3.bmp");
+        break;
+        case 3:
+            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led4.bmp");
+        break;
+        case 4:
+            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led5.bmp");
+        break;
+        case 5:
+            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led6.bmp");
+        break;
+        case 6:
+            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led7.bmp");
+        break;
+    }
+
+    labelLed->setPixmap(px);
+
+    if(direcao)
+    {
+        if(++led >= 6)
+        {
+            direcao = false;
+            led = 5;
+        }
+    }
+    else
+    {
+        if(--led < 0)
+        {
+            direcao = true;
+            led = 1;
+        }
+    }
 }
 
 void MainWindow::SentencaOk()
@@ -140,6 +193,8 @@ void MainWindow::SentencaOk()
 		ButtonStop->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
+
+    AtivaBarraLeds();
 }
 
 void MainWindow::ErroGpsSentencaInvalida()
@@ -157,6 +212,8 @@ void MainWindow::ErroGpsSentencaInvalida()
 		ButtonStop->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
+
+    AtivaBarraLeds();
 }
 
 void MainWindow::ErroGpsFalhaSentenca()
@@ -174,6 +231,8 @@ void MainWindow::ErroGpsFalhaSentenca()
 		ButtonStop->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
+
+    AtivaBarraLeds();
 }
 
 void MainWindow::ErroGps()
@@ -198,13 +257,30 @@ void MainWindow::SetHdop(int valor)
 	horizontalSliderHdop->setValue(valor);
 }
 
-
-static QMessageBox *mbox = NULL;
-
-void MainWindow::SendMsg(const char *msg, int timer)
+void MainWindow::on_PlotaCoordenadas(COORDENADAS coord)
 {
-	//timer = 0->sem temporização, botão ok necessario
-	mbox = new QMessageBox(this);
+/*	//adiciona no vetor de coordenadas
+	frameNav->AddPontos(
+
+	//plota na metade da tela 
+	frameNav->repaint();
+*/
+}
+
+void MainWindow::Plota(COORDENADAS coord)
+{
+	//conecta signal e slot para evitar que thread atue sobre a janela principal
+    connect(this, SIGNAL(PlotaCoordenadas(COORDENADAS)), this, SLOT(on_PlotaCoordenadas(COORDENADAS)));
+
+	//envia sinal on_MsgBox_clicked
+    emit PlotaCoordenadas(coord);
+}
+
+
+void MainWindow::on_AbreMsgBox(const char *msg, int timer)
+{
+	//slot ativado pelo signal AbreMsgBox
+	QMessageBox *mbox = new QMessageBox(this);
 
 	if(timer == 0)
 	{
@@ -215,26 +291,33 @@ void MainWindow::SendMsg(const char *msg, int timer)
 	}
 	else
 	{
-		mbox = new QMessageBox(this);
-
 		//timer = tempo em milisegundos
 		QTimer::singleShot(timer, mbox, SLOT(hide()));
 		mbox->setWindowTitle("ATENCAO");
 		mbox->setText(msg);
 		mbox->setStandardButtons(QMessageBox::NoButton);
 	}
+    mbox->show();
+}
 
-	mbox->show();
+void MainWindow::SendMsg(const char *msg, int timer)
+{
+	//conecta signal e slot para evitar que thread atue sobre a janela principal
+    connect(this, SIGNAL(AbreMsgBox(const char*, int)), this, SLOT(on_AbreMsgBox(const char*, int)));
+
+	//envia sinal on_MsgBox_clicked
+    emit AbreMsgBox(msg, timer);
 }
 
 void MainWindow::on_ButtonIniciar_clicked()
 {
-    DialogMarco d;
-
-    if(d.exec() == 1)
+	//se marco inicial não estiver configurado não inicia gravação
+	if(labelMarcoAtual->text().size() == 0)
+	{
+		QMessageBox::information(NULL, "ERRO", "Faltou Configurar Marco Atual");
+	}
+    else
     {
-        labelMarcoInicial->setText(d.GetMarco());
-        //valor aceito
         //inicia thread GPS
         ButtonStop->setEnabled(true);
         ButtonIniciar->setEnabled(false);
@@ -242,10 +325,6 @@ void MainWindow::on_ButtonIniciar_clicked()
         string strSerial = comboBoxSerial->currentText().toLocal8Bit();
 
         mpresenter->IniciaGps(strSerial);
-    }
-    else
-    {
-        QMessageBox::information(NULL, "Erro", "Faltou Entrar com Marco Inicial");
     }
 }
 
@@ -389,12 +468,21 @@ void MainWindow::on_pushButtonFimSb_clicked()
 
 void MainWindow::on_pushButtonMarco_clicked()
 {
-    DialogMarco dialogMarco;
+    PN_DATA data;
 
-    if(dialogMarco.exec() == 1)
+    data.pntipo = PN_MARCO;
+
+    if(mdistanciaUltimoMarco > 500)
     {
-
+        //incrementa marco automaticamente se distancia maior que 500 do marco anterior
+        mmarcoAtual++;
     }
+
+	QString qStr = QString::number(mmarcoAtual);
+
+	data.Marco = qStr.toLocal8Bit();
+
+    mpresenter->ProcessaMQ(data);
 }
 
 void MainWindow::on_pushButtonUsuario_clicked()
@@ -406,4 +494,37 @@ void MainWindow::on_pushButtonUsuario_clicked()
 
     }
 
+}
+
+void MainWindow::SetDistanciaProximoMarco(int distancia)
+{
+	labelDistanciaProximoMarco->setText(QString().setNum(distancia));
+}
+
+void MainWindow::on_toolButtonProximoMarco_clicked()
+{
+    DialogMarco dialogMarco;
+
+    if(dialogMarco.exec() == 1)
+    {
+        //atualiza marco atual com o novo valor
+        labelProximoMarco->setText(dialogMarco.GetMarco());
+    }
+}
+
+void MainWindow::on_toolButtonMarcoAtual_clicked()
+{
+    DialogMarco dialogMarco;
+
+    if(dialogMarco.exec() == 1)
+    {
+        labelMarcoAtual->setText(dialogMarco.GetMarco());
+        mmarcoAtual = labelMarcoAtual->text().toInt();
+        mproximoMarco = mmarcoAtual + 1;
+        std::stringstream marco;
+        marco << mproximoMarco;
+        labelProximoMarco->setText(marco.str().c_str());
+
+        mpresenter->SalvaMarcoAtual(mmarcoAtual);
+    }
 }

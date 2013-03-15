@@ -32,12 +32,12 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 		//deve estar parado
 		if(mgpsData.velocidade != 0)
 		{
-			mmodel->SendMsg("Velocidade Deve Ser Zero para Marcar Ponte!");
+			mmodel->GuiSendMsg("Velocidade Deve Ser Zero para Marcar Ponte!");
 		}
 		else
 		{
 			//marcar ponte no log durante 20 segundos leituras de gps
-			mmodel->SendMsg("Aguarde! Marcando Inicio de Ponte", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
+			mmodel->GuiSendMsg("Aguarde! Gravando Inicio de Ponte", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
 			boost::thread(Thread, this);  
 		}
 	break;
@@ -46,12 +46,12 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 		//deve estar parado
 		if(mgpsData.velocidade != 0)
 		{
-			mmodel->SendMsg("Velocidade Deve Ser Zero para Marcar Ponte!");
+			mmodel->GuiSendMsg("Velocidade Deve Ser Zero para Marcar Ponte!");
 		}
 		else
 		{
 			//marcar ponte no log durante 20 segundos leituras de gps
-			mmodel->SendMsg("Aguarde! Marcando Fim de Ponte", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
+			mmodel->GuiSendMsg("Aguarde! Gravando Fim de Ponte", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
 			boost::thread(Thread, this);  
 		}
 	break;
@@ -61,12 +61,12 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 		//deve estar parado
 		if(mgpsData.velocidade != 0)
 		{
-			mmodel->SendMsg("Velocidade Deve Ser Zero para Marcar Tunel!");
+			mmodel->GuiSendMsg("Velocidade Deve Ser Zero para Marcar Tunel!");
 		}
 		else
 		{
 			//marcar ponte no log durante 20 segundos leituras de gps
-			mmodel->SendMsg("Aguarde! Marcando Inicio de tunel", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
+			mmodel->GuiSendMsg("Aguarde! Gravando Inicio de tunel", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
 			boost::thread(Thread, this);  
 		}
 	break;
@@ -76,12 +76,12 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 		//deve estar parado
 		if(mgpsData.velocidade != 0)
 		{
-			mmodel->SendMsg("Velocidade Deve Ser Zero para Marcar Tunel!");
+			mmodel->GuiSendMsg("Velocidade Deve Ser Zero para Marcar Tunel!");
 		}
 		else
 		{
 			//marcar ponte no log durante 20 segundos leituras de gps
-			mmodel->SendMsg("Aguarde! Marcando Fim de Tunel", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
+			mmodel->GuiSendMsg("Aguarde! Gravando Fim de Tunel", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
 			boost::thread(Thread, this);  
 		}
 	break;
@@ -91,12 +91,12 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 		//deve estar parado
 		if(mgpsData.velocidade != 0)
 		{
-			mmodel->SendMsg("Velocidade deve ser zero para marcar SB!");
+			mmodel->GuiSendMsg("Velocidade deve ser zero para marcar SB!");
 		}
 		else
 		{
 			//marcar ponte no log durante 20 segundos leituras de gps
-			mmodel->SendMsg("Aguarde! Marcando Inicio de SB", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000 );
+			mmodel->GuiSendMsg("Aguarde! Gravando Inicio de SB", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000 );
 			//dispara thread para marcaçao das coordenadas
 			boost::thread(Thread, this);  
 
@@ -107,45 +107,23 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 		//deve estar parado
 		if(mgpsData.velocidade != 0)
 		{
-			mmodel->SendMsg("Velocidade deve ser zero para marcar ponte!");
+			mmodel->GuiSendMsg("Velocidade deve ser zero para marcar ponte!");
 		}
 		else
 		{
 			//marcar ponte no log durante 20 segundos leituras de gps
-			mmodel->SendMsg("Aguarde! Marcando fim de SB", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
+			mmodel->GuiSendMsg("Aguarde! Gravando fim de SB", TEMPO_LEITURA_DE_PONTO_NOTAVEL * 1000);
 			boost::thread(Thread, this);  
 		}
 	break;
 
-	case PN_MARCO:
-		SetMarco();
-		mmodel->SendMsg("Marcando Marco", 4);
-	break;
-
-	case PN_MARCOAUTOMATICO:
-		SetMarco();
-		mmodel->SendMsg("Marcando Marco Automatico", 4);
-	break;
 	case PN_PASSAGEMNIVEL:
 		SetPassagemNivel();
-		mmodel->SendMsg("Marcando Passagem de Nivel", 4);
+		mmodel->GuiSendMsg("Gravando Passagem de Nivel", 4000);
+	break;
 	}
 }
 
-//---------------------------------------------------------------------------
-void CtrlPontosNotaveis::SetMarco()
-{
-	stringstream strgpsdado;
-	COORDENADAS gpsData = GetDadosGps();
-
-	strgpsdado << string("LATITUDE:") << gpsData.latitude << "LONGITUDE:" << gpsData.longitude;
-
-	std::string header;
-
-	strgpsdado >> header;
-
-	LogMgr::GetInstance()->Escreve(mpnData.pntipo == PN_MARCOAUTOMATICO ? "PN_MARCOAUTOMATICO" : "PN_MARCO", header);
-}
 
 //---------------------------------------------------------------------------
 void CtrlPontosNotaveis::SetPassagemNivel()
@@ -153,13 +131,13 @@ void CtrlPontosNotaveis::SetPassagemNivel()
 	stringstream strgpsdado;
 	COORDENADAS gpsData = GetDadosGps();
 
-	strgpsdado << string("LATITUDE:") << gpsData.latitude << "LONGITUDE:" << gpsData.longitude;
+	strgpsdado << string("LATITUDE: ") << gpsData.latitude << ", LONGITUDE: " << gpsData.longitude << ", ALTITUDE: " << gpsData.altitude;
 
 	std::string header;
 
-	strgpsdado >> header;
+	header = strgpsdado.str();
 
-	LogMgr::GetInstance()->Escreve(mpnData.pntipo == PN_MARCOAUTOMATICO ? "PN_MARCOAUTOMATICO" : "PN_MARCO", header);
+	LogMgr::GetInstance()->Escreve("PN_PASSAGEMNIVEL", header);
 }
 
 
@@ -233,7 +211,7 @@ void CtrlPontosNotaveis::Run()
 			COORDENADAS gpsData = GetDadosGps();
 
 			stringstream strgpsdado;
-			strgpsdado << string("LATITUDE: ") << gpsData.latitude << ", LONGITUDE: " << gpsData.longitude;
+			strgpsdado << string("LATITUDE: ") << gpsData.latitude << ", LONGITUDE: " << gpsData.longitude << ", ALTITUDE: " << gpsData.altitude;
 
 			std::string header2 = strgpsdado.str();
 

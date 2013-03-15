@@ -23,7 +23,8 @@ enum PN_TIPO
 	PN_INICIOSB,
 	PN_FIMSB,
 	PN_MARCO,
-	PN_MARCOAUTOMATICO
+	PN_MARCOAUTOMATICO,
+	PN_MARCOINICIAL
 };
 
 enum PN_INICIOTIPO
@@ -62,6 +63,13 @@ struct PN_DATA
 	PN_CHAVE pnchave;
 };
 
+struct COORDENADAS
+{
+	long latitude;
+	long longitude;
+	double velocidade;
+	double altitude;
+};
 
 
 class IView;
@@ -69,9 +77,12 @@ class IView;
 class IModel
 {
 public:
+	//metodos abstratos onde a GUI acessa Model (para acesso as demais classes)
 	virtual void ModelIniciaGps(std::string InterfaceSerial) {}
 	virtual void ModelTerminarCaptura() {}
 	virtual void ModelProcessaPN(PN_DATA) {}
+	virtual void ModelProcessaMQ(PN_DATA) {}
+	virtual void ModelSalvaMarcoAtual(int marco) {}
 };
 
 
@@ -93,18 +104,20 @@ public:
 	virtual void ModelPausarCaptura();
 	virtual void ModelTerminarCaptura();
 	virtual void ModelProcessaPN(PN_DATA pn);
+	virtual void ModelProcessaMQ(PN_DATA pn);
+	virtual void ModelSalvaMarcoAtual(int marco);
 
 	bool ModoGravacao();
 
 	//envia para GUI
-	void ErroGpsFalhaSentenca();
-	void ErroGpsSentencaInvalida();
-	void SentencaOk();
-	void ErroGps();
-	void SetHdop(float valor);
-	void SendMsg(const char *msg, int timer = 0);
-
-
+	void GuiErroGpsFalhaSentenca();
+	void GuiErroGpsSentencaInvalida();
+	void GuiSentencaOk();
+	void GuiErroGps();
+	void GuiSetHdop(float valor);
+	void GuiSendMsg(const char *msg, int timer = 0);
+	void GuiSetDistanciaProximoMarco(int distancia);
+	void GuiPlota(COORDENADAS coord);
 };
 
 

@@ -26,6 +26,8 @@ public:
 	virtual void ErroGps() = 0;
 	virtual void SetHdop(int valor) = 0;
 	virtual void SendMsg(const char *msg, int timer) = 0;
+	virtual void SetDistanciaProximoMarco(int dist) = 0;
+	virtual void Plota(COORDENADAS coord) = 0;
 };
 
 
@@ -61,6 +63,17 @@ public:
 	{
 		mmodel->ModelProcessaPN(pn);
 	};
+
+	virtual void ProcessaMQ(PN_DATA pn)
+	{
+		mmodel->ModelProcessaMQ(pn);
+	};
+
+	virtual void SalvaMarcoAtual(int marco)
+	{
+		mmodel->ModelSalvaMarcoAtual(marco);
+	}
+
 
 private:
 	IView *mview;

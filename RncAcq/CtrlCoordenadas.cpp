@@ -24,30 +24,25 @@ void CtrlCoordenadas::GetCoordenadas(COORDENADAS &dados)
 }
 
 //---------------------------------------------------------------------------
-void CtrlCoordenadas::ExecutaProcessamento()
+bool CtrlCoordenadas::ExecutaProcessamento()
 {
+	bool retval = false;
+
 	//processa estrutura GPSDATA
 
 	//verifica se as sentenças estão presentes
 	if(mgpsData.ParserGGA == true && mgpsData.ParserRMC == true)
 	{
-		//verifica se os dados da sentença RMC estão válidos
-		if(mgpsData.receiverWarning == 'A')
-		{
-			//dados válidos
-			mdadosCoordenadas.latitude = mgpsData.latitude.valor;
-			mdadosCoordenadas.longitude = mgpsData.longitude.valor;
-			mdadosCoordenadas.velocidade = mgpsData.velocidade;
-		}
-		else
-		{
-			//avisa interface gráfica que está sem sinal
-		}
+		//dados válidos
+		mdadosCoordenadas.latitude = mgpsData.latitude.valor;
+		mdadosCoordenadas.longitude = mgpsData.longitude.valor;
+		mdadosCoordenadas.velocidade = mgpsData.velocidade;
+		mdadosCoordenadas.altitude = mgpsData.altitude;
+
+		retval = true;
 	}
-	else
-	{
-		//avisa interface gráfica que não recebeu as sentenças 
-	}
+
+	return retval;
 }
 
 //---------------------------------------------------------------------------
@@ -76,15 +71,6 @@ bool CtrlCoordenadas::RecebeDadosGps()
 	}
 
 	return retval;
-
-
-/*
-	if(mgpsQueue.Receive(&mgpsData))
-	{
-		retval = true;
-	}
-
-	return retval;*/
 }
 
 //---------------------------------------------------------------------------------
@@ -103,9 +89,14 @@ void CtrlCoordenadas::Run()
 		//verifica se recebeu dados de GPS
 		if(RecebeDadosGps())
 		{
-			ExecutaProcessamento();
-			//notifica observers
-			NotifyObservers();
+			if(ExecutaProcessamento())
+			{
+				//plota na tela principal
+				mmodel->GuiPlota(mdadosCoordenadas);
+
+				//notifica observers
+				NotifyObservers();
+			}
 		}
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(200));

@@ -1,38 +1,28 @@
 //---------------------------------------------------------------------------
-
+#include <boost/thread/thread.hpp> 
+#include <boost/lexical_cast.hpp>
 #include "CtrlMarcoQuilometrico.h"
 #include "CtrlCoordenadas.h"
-
+#include "LogMgr.h"
+#include <fstream>
 
 //-----------------------------------------------------------------------------
 CtrlMarcoQuilometrico::CtrlMarcoQuilometrico(Model *model)
 {
 	mmodel = model;
-	mmarcoInicial.coordenada.latitude = 0;
-	mmarcoInicial.coordenada.longitude = 0;
-	mmarcoInicial.km = 0;
-	multimoMarco = mmarcoInicial;
+	mmarcoAtual = 0;
+	mmarcoAnterior = mmarcoAtual;
+	mmarcoInicialGravado = false;
+	mdistanciaMarcoAnterior = 0;
+	mdistancia10Km = 0;
+	mthread = boost::thread(Thread, this);
 }
 
 //-----------------------------------------------------------------------------
-void CtrlMarcoQuilometrico::SalvarMarcoInicial(MARCO marco)
+void CtrlMarcoQuilometrico::SalvaMarcoAtual(int marco)
 {
-	mmarcoInicial = marco;
+	mmarcoAtual = marco;
 }
-
-//-----------------------------------------------------------------------------
-void CtrlMarcoQuilometrico::SalvarMarcoAtual(MARCO marco)
-{
-	multimoMarco = marco;
-}
-
-//-----------------------------------------------------------------------------
-void CtrlMarcoQuilometrico::EventoSalvarMarcoManual()
-{
-	//pega coordenadas atuais
-
-}
-
 
 //-----------------------------------------------------------------------------
 double CtrlMarcoQuilometrico::ConverteGrausParaRadianos (double graus)
@@ -96,42 +86,179 @@ double CtrlMarcoQuilometrico::CalculaDistanciaHaversine(COORDENADAS ponto1, COOR
 }
 
 //---------------------------------------------------------------------------
+void CtrlMarcoQuilometrico::Notify(Subject *p)
+{
+	static bool primeiracoordenada = true;
+	COORDENADAS coord;
+
+	//processamento de marco->notificado pela thread ctrlCoordenadas
+	boost::lock_guard <boost::mutex> guard (mqMutex);
+	//guarda coordenada
+	((CtrlCoordenadas *)p)->GetCoordenadas(coord);
+	vecCoord.push(coord);
+}
+
+//---------------------------------------------------------------------------
+bool CtrlMarcoQuilometrico::GetCoordenadas(COORDENADAS &coordAtual, bool retiraDaFila)
+{
+	bool retval = false;
+
+	boost::lock_guard <boost::mutex> guard (mqMutex);
+	
+	if(vecCoord.empty())
+		retval = false;
+	else
+	{
+		coordAtual = vecCoord.front();
+		if(retiraDaFila)
+		{
+			vecCoord.pop();
+		}
+		retval = true;
+	}
+
+	return retval;
+}
+
+//---------------------------------------------------------------------------
+int CtrlMarcoQuilometrico::GetNumCoordenadas()
+{
+	int retval = 0;
+
+	boost::lock_guard <boost::mutex> guard (mqMutex);
+	
+	retval = vecCoord.size();
+
+	return retval;
+}
+
+//---------------------------------------------------------------------------
+void CtrlMarcoQuilometrico::ProcessaMQ(PN_DATA pnData)
+{
+	//envia para LogMgr gravar marco
+	GravaMarco("PN_MARCO", pnData);
+	mmodel->GuiSendMsg("Aguarde: Gravando Marco", 3000);
+}
+
+//---------------------------------------------------------------------------
+void CtrlMarcoQuilometrico::GravaMarco(string tag, PN_DATA pnData)
+{
+	stringstream strgpsdado;
+
+	//atualiza marco atual
+	mmarcoAnterior = mmarcoAtual;
+
+	stringstream(pnData.Marco) >> mmarcoAtual;
+
+	strgpsdado << "MARCO: " << pnData.Marco;
+
+	std::string header;
+
+	header = strgpsdado.str();
+
+	LogMgr::GetInstance()->Escreve(tag, header);
+}
+
+boost::mutex xmutex;
+
+//---------------------------------------------------------------------------
+void CtrlMarcoQuilometrico::Thread(CtrlMarcoQuilometrico *ctrlMq)
+{
+	boost::lock_guard < boost::mutex > guard (xmutex);
+	ctrlMq->Run();
+}
+
+//---------------------------------------------------------------------------
 // ponto1 - coordenada do primeiro ponto em décimos de segundo de grau
 // ponto2 - coordenada do segundo ponto em décimos de segundo de grau
 // retval - distancia em metros entre os dois pontos.
-double CtrlMarcoQuilometrico::ControleDeDistanciaDeMarco(COORDENADAS coordenadaAtual)
+double CtrlMarcoQuilometrico::ControleDeDistanciaDeMarco(COORDENADAS coordAtual, COORDENADAS coordAnterior)
 {
 	//calcula distancia entre duas coordenadas
-	double distancia = CalculaDistanciaHaversine(mcoordenadaAnterior, coordenadaAtual);
+	double distancia = 0;
 
-	//atualiza coordenada
-	mcoordenadaAnterior = coordenadaAtual;
-
-	mdistanciaAcumulada += distancia;
-	mdistancia10Km += distancia;
-
-	if(mdistanciaAcumulada > DISTANCIA_PARA_MARCO_AUTOMATICO)
+	if(coordAtual.velocidade > 0)
 	{
-		//efetuar marco automatico
+		//altera distancia apenas se velocidade diferente de zero->evita flutuações no sinal
+		//alterando distancia
+		distancia = CalculaDistanciaHaversine(coordAnterior, coordAtual);
 
-		//zerar distancia para ultimo marco
-		mdistanciaAcumulada = 0;
+		mdistanciaMarcoAnterior += distancia;
+		mdistancia10Km += distancia;
 	}
 
-	if(mdistanciaAcumulada > DISTANCIA_PARA_MARCO_PARADO)
+	//grava marco inicial
+	if(mmarcoInicialGravado == false)
+	{
+		PN_DATA pn;
+
+		pn.pntipo = PN_MARCOINICIAL;
+
+		pn.Marco = boost::lexical_cast<std::string>(mmarcoAtual);
+
+		//envia para LogMgr gravar marco
+		GravaMarco("PN_MARCOINICIAL", pn);
+		mmodel->GuiSendMsg("Aguarde: Gravando Marco Inicial", 3000);
+	
+		mmarcoInicialGravado = true;
+	}
+
+	if(mdistanciaMarcoAnterior > DISTANCIA_PARA_MARCO_AUTOMATICO)
+	{
+		//efetuar marco automatico
+		PN_DATA data;
+		data.pntipo = PN_MARCOAUTOMATICO;
+		data.Marco = boost::lexical_cast<std::string>(mmarcoAtual);
+
+		//envia para LogMgr gravar marco
+		GravaMarco("PN_MARCOAUTOMATICO", data);
+		mmodel->GuiSendMsg("Aguarde: Gravando Marco Automatico", 3000);
+
+		//zerar distancia para ultimo marco
+		mdistanciaMarcoAnterior = 0;
+	}
+
+	if(mdistancia10Km > DISTANCIA_PARA_MARCO_PARADO)
 	{
 		//avisar GUI para parar no proximo marco
-
+		mmodel->GuiSendMsg("ATENCAO: 10 Km SEM PARADA. PARAR NO PROXIMO MARCO PARA EFETUAR MEDICAO");
 		//zerar distancia 10 km para parada (marcação de marco com vel = 0 a cada 10 Km)
 		mdistancia10Km = 0;
 	}
+	
 
 	return distancia;
 }
 
 //---------------------------------------------------------------------------
-void CtrlMarcoQuilometrico::Notify(Subject *p)
+void CtrlMarcoQuilometrico::Run()
 {
-	//processamento de marco->notificado pela thread ctrlCoordenadas
-	((CtrlCoordenadas *)p)->GetCoordenadas(mcoordenadaAtual);
+	//thread que controla marco automatico e aviso de parada a cada 10 Km
+	COORDENADAS coordAtual;
+	COORDENADAS coordAnterior;
+	double distMarcoAnterior;
+	
+	while(1)
+	{
+		int Num = GetNumCoordenadas();
+
+		if(GetNumCoordenadas() > 1)
+		{
+			//pego coordenada anterior (ser houver mais de duas disponiveis)
+			if(GetCoordenadas(coordAnterior, true))
+			{
+				int Num = GetNumCoordenadas();
+				//tento pegar a coordenada atual -> não retira da fila para proximo processamento
+				if(GetCoordenadas(coordAtual, false))
+				{
+					//controle de distancias entre marcos
+					distMarcoAnterior = ControleDeDistanciaDeMarco(coordAtual, coordAnterior);
+					//atualizar na GUI a distancia para o proximo marco (decrescente)
+					mmodel->GuiSetDistanciaProximoMarco((int)(1000 - mdistanciaMarcoAnterior));
+				}
+			}
+		}
+
+		boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+	}
 }

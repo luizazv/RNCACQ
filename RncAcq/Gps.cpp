@@ -4,8 +4,6 @@
 #include "Gps.h"
 #include "LogMgr.h"
 
- boost::scoped_ptr<message_queue> mq;
-
 //----------------------------------------------------------------------------------
 Gps::Gps(Model *model)
 {
@@ -15,14 +13,15 @@ Gps::Gps(Model *model)
 	mgpsData.latitude.valor = 0;
 	mgpsData.longitude.valor = 0;
 	mgpsData.estado = GPS_TIMEOUT;
+	mgpsData.ParserGGA = false;
+	mgpsData.ParserRMC = false;
+	mgpsData.receiverWarning = 0;
 	mEstado = 0;
 	mterminaThread = false;
 	mtolerancia = 0;
 
 	message_queue::remove(NOME_CTRL_COORDENADAS_QUEUE);
-	mq.reset(new message_queue(create_only, NOME_CTRL_COORDENADAS_QUEUE, 4, sizeof(GPSDATA)));
-//	mgpsQueue.InitProdutor(1000, NOME_CTRL_COORDENADAS_QUEUE);
-
+	mq.reset(new message_queue(create_only, NOME_CTRL_COORDENADAS_QUEUE, 8, sizeof(GPSDATA)));
 }
 
 //---------------------------------------------------------------------------------
@@ -176,7 +175,7 @@ bool Gps::VerificaBcc()
 	if(pont != string::npos)
 	{
 		//evitar que pont acesse memoria maior que mSentenca (caso '*' esteja no último endereço de mSentenca)
-		if(mSentenca.size() >= (unsigned int)(pont + 2) ) 
+		if(mSentenca.size() > (unsigned int)(pont + 2) ) 
 		{
 			char bcc1 = mSentenca[pont + 1];
 			char bcc2 = mSentenca[pont + 2];
@@ -290,6 +289,13 @@ bool Gps::PassoHDOP( char *Token )
 }
 
 //---------------------------------------------------------------------------------
+bool Gps::PassoAltitude( char *Token )
+{
+	mgpsData.altitude = ( float )atof ( Token );
+	return true;
+}
+
+//---------------------------------------------------------------------------------
 bool Gps::ParserGGA()
 {
 	bool retval = false;
@@ -309,7 +315,8 @@ bool Gps::ParserGGA()
 		&Gps::PassoVazio,	// hemisfério
 		&Gps::PassoVazio,	// Indicador de qualidade
 		&Gps::PassoNroSat,	// Número de satélites em uso
-		&Gps::PassoHDOP		// HDOP
+		&Gps::PassoHDOP,	// HDOP
+		&Gps::PassoAltitude		//altitude da antena nivel do mar
 	};
 
 	
@@ -323,7 +330,7 @@ bool Gps::ParserGGA()
 		boost::char_separator<char> sep(",");
 		boost::tokenizer< boost::char_separator<char> >tok(mSentenca, sep);
 
-		for(boost::tokenizer< boost::char_separator <char> >::iterator beg = tok.begin(); i < 9 && beg != tok.end(); beg++)
+		for(boost::tokenizer< boost::char_separator <char> >::iterator beg = tok.begin(); i < 10 && beg != tok.end(); beg++)
 		{
 			stringstream(*beg) >> tokstr;
 
@@ -339,11 +346,12 @@ bool Gps::ParserGGA()
 			}
 		}
 
-		if(i == 9)
+		if(i == 10)
 		{
 			mgpsData.ParserGGA = true;
 			retval = true;
 
+			//vdop e hdop estão presentes em GSA que não é tratada nesta versão
 			mgpsData.VDOP = 0;
 			mgpsData.PDOP = 0;
 		}
@@ -577,14 +585,14 @@ void Gps::ProcessaSentenca()
 			EnviaParaCtrlCoordenadas();
 
 			//indica que a sentenca GPRMC é válida e recebeu tmabém a GGA (icone GPS verde)
-			mmodel->SentencaOk();
+			mmodel->GuiSentencaOk();
 			//atualiza 
-			mmodel->SetHdop(mgpsData.HDOP);
+			mmodel->GuiSetHdop(mgpsData.HDOP);
 		}
 		else
 		{
 			//indica sentenca invalida-> ativa icone amarelo
-			mmodel->ErroGpsSentencaInvalida();
+			mmodel->GuiErroGpsSentencaInvalida();
 		}
 
 		mtolerancia = 0;
@@ -596,7 +604,7 @@ void Gps::ProcessaSentenca()
 		{
 			//com tolerancia de 4 leituras avisa GUI que
 			//não recebeu as sentencas esperadas (icone amarelo)
-			mmodel->ErroGpsSentencaInvalida();
+			mmodel->GuiErroGpsSentencaInvalida();
 		}
 		else
 		{
@@ -634,8 +642,8 @@ void Gps::Run()
 				else
 				{
 					//avisar GUI que não está recebendo sentenças (icone vermelho)
-					mmodel->ErroGpsFalhaSentenca();
-					mmodel->SetHdop(HDOP_FIMESCALA);
+					mmodel->GuiErroGpsFalhaSentenca();
+					mmodel->GuiSetHdop(HDOP_FIMESCALA);
 					boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 				}
 			break;
@@ -651,8 +659,8 @@ void Gps::Run()
 	}
 
 	//envia mensagem para GUI e termina thread
-	mmodel->ErroGps();
-	mmodel->SetHdop(HDOP_FIMESCALA);
+	mmodel->GuiErroGps();
+	mmodel->GuiSetHdop(HDOP_FIMESCALA);
 	mSerial.close();
 }
 

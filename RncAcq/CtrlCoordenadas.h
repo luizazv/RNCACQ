@@ -10,15 +10,6 @@
 
 using namespace std;
 
-struct COORDENADAS
-{
-	long latitude;
-	long longitude;
-	double velocidade;
-	double altitude;
-};
-
-
 class CtrlCoordenadas : public Subject
 {
 private:
@@ -29,7 +20,7 @@ private:
 	COORDENADAS mdadosCoordenadas;
 	Model *mmodel;
 
-	void ExecutaProcessamento();
+	bool ExecutaProcessamento();
 	bool RecebeDadosGps();
 	void Run();
 

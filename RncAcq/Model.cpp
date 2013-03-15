@@ -22,63 +22,33 @@ Model::Model(IView *view)
 }
 
 //-----------------------------------------------------------------------------
-void Model::ModelIniciaGps(std::string InterfaceSerial)
-{
-	//neste primeiro momento a GUI apenas configura a serial
-	SERIALDATA gpsSerialData;
-
-	gpsSerialData.acao = gpsSerialData.serOpen;
-	gpsSerialData.baudrate = 4800;
-
-	//testar OS-> se Windows = "COMX", outros "/tty...
-	//esta versão é para windows
-	//retira numero da serial
-	unsigned int pos = InterfaceSerial.find(' ');
-
-	if(pos != string::npos)
-	{
-		//retira numero da serial
-		string Numero = InterfaceSerial.substr(pos + 1);
-		string com = "COM";
-		com += Numero;
-
-		((Gps *)mgps)->Inicia(com);
-	}
-
-}
-
-void Model::ModelPausarCaptura()
-{
-}
-
-void Model::ModelTerminarCaptura()
-{
-	((Gps *)mgps)->Termina();
-}
-
-void Model::ErroGpsFalhaSentenca()
+void Model::GuiErroGpsFalhaSentenca()
 {
 	mview->ErroGpsFalhaSentenca();
 }
 
-void Model::ErroGpsSentencaInvalida()
+//-----------------------------------------------------------------------------
+void Model::GuiErroGpsSentencaInvalida()
 {
 	//avisa erros do GPS para janela principal
 	mview->ErroGpsSentencaInvalida();
 }
 
-void Model::SentencaOk()
+//-----------------------------------------------------------------------------
+void Model::GuiSentencaOk()
 {
 	mview->SentencaOk();
 }
 
-void Model::ErroGps()
+//-----------------------------------------------------------------------------
+void Model::GuiErroGps()
 {
 	//avisa GUI->erro geral
 	mview->ErroGps();
 }
 
-void Model::SetHdop(float valor)
+//-----------------------------------------------------------------------------
+void Model::GuiSetHdop(float valor)
 {
 	//transforma o valor entre 0 e 48->vermelho
 	//entre 49 e 75-> amarelo
@@ -113,12 +83,72 @@ void Model::SetHdop(float valor)
 	mview->SetHdop(y);
 }
 
-void Model::SendMsg(const char *msg, int timer)
+//-----------------------------------------------------------------------------
+void Model::GuiSendMsg(const char *msg, int timer)
 {
 	mview->SendMsg(msg, timer);
 }
 
+//-----------------------------------------------------------------------------
+void Model::GuiSetDistanciaProximoMarco(int distancia)
+{
+	mview->SetDistanciaProximoMarco(distancia);
+}
+
+//-----------------------------------------------------------------------------
+void Model::GuiPlota(COORDENADAS coord)
+{
+	mview->Plota(coord);
+}
+
+//-----------------------------------------------------------------------------
+void Model::ModelIniciaGps(std::string InterfaceSerial)
+{
+	//neste primeiro momento a GUI apenas configura a serial
+	SERIALDATA gpsSerialData;
+
+	gpsSerialData.acao = gpsSerialData.serOpen;
+	gpsSerialData.baudrate = 4800;
+
+	//testar OS-> se Windows = "COMX", outros "/tty...
+	//esta versão é para windows
+	//retira numero da serial
+	unsigned int pos = InterfaceSerial.find(' ');
+
+	if(pos != string::npos)
+	{
+		//retira numero da serial
+		string Numero = InterfaceSerial.substr(pos + 1);
+		string com = "COM";
+		com += Numero;
+
+		((Gps *)mgps)->Inicia(com);
+	}
+
+}
+
+void Model::ModelPausarCaptura()
+{
+}
+
+void Model::ModelTerminarCaptura()
+{
+	((Gps *)mgps)->Termina();
+}
+
+
 void Model::ModelProcessaPN(PN_DATA pn)
 {
-	((CtrlPontosNotaveis*)mctrlPN)->ProcessaPN(pn);
+	((CtrlPontosNotaveis *)mctrlPN)->ProcessaPN(pn);
 }
+
+void Model::ModelProcessaMQ(PN_DATA pn)
+{
+	((CtrlMarcoQuilometrico *)mctrlMQ)->ProcessaMQ(pn);
+}
+
+void Model::ModelSalvaMarcoAtual(int marco)
+{
+	((CtrlMarcoQuilometrico *)mctrlMQ)->SalvaMarcoAtual(marco);
+}
+

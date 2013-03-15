@@ -55,6 +55,7 @@ struct GPSDATA
 	float HDOP;
 	float VDOP;
 	float PDOP;
+	float altitude;
 };
 
 struct SERIALDATA
@@ -93,7 +94,8 @@ private:
 	void *mIdLog;
 	bool mterminaThread;
 	int mtolerancia;
-	
+	boost::scoped_ptr<message_queue> mq;
+
 	void EnviaSentenca(char *sentenca);
 	void GravaLog();
 
@@ -120,6 +122,7 @@ private:
 	bool PassoVazio( char *Token);
 	bool PassoNroSat( char *Token );
 	bool PassoHDOP( char *Token );
+	bool PassoAltitude( char *Token );
 
 	bool ParserGGA();
 	void CalculaBcc(char *sBcc);

@@ -17,14 +17,16 @@ SOURCES += main.cpp\
     dialogmarco.cpp \
     dialogfecharsb.cpp \
     dialogabrirsb.cpp \
-    dialogdefinidousuario.cpp
+    dialogdefinidousuario.cpp \
+    framenav.cpp
 
 HEADERS  += \
     mainwindow.h \
     dialogmarco.h \
     dialogfecharsb.h \
     dialogabrirsb.h \
-    dialogdefinidousuario.h
+    dialogdefinidousuario.h \
+    framenav.h
 
 FORMS    += mainwindow.ui \
     dialogmarco.ui \

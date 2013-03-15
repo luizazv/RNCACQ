@@ -4,6 +4,7 @@
 #define CtrlMarcoQuilometricoH
 
 #include <string>
+#include <queue>
 #include "Observer.h"
 #include "CtrlCoordenadas.h"
 #include "Model.h"
@@ -25,39 +26,43 @@ const double GPDSGRAU = 3.09172;			// distância em metros na linha do equador de
 #define DISTANCIA_PARA_MARCO_AUTOMATICO	1000
 
 //distancia para avisar que o próximo marco deve ser marcado parado
-#define DISTANCIA_PARA_MARCO_PARADO	9500
-
-struct MARCO
-{
-	long km;
-	COORDENADAS coordenada;
-};
+#define DISTANCIA_PARA_MARCO_PARADO	9800
 
 class CtrlMarcoQuilometrico : public Observer
 {
 private:
-	MARCO multimoMarco;
-	MARCO mmarcoInicial;
+	int mmarcoAnterior;
+	int mmarcoAtual;
 	Model *mmodel;
+	boost::mutex mqMutex;
+	bool mmarcoInicialGravado;
+	std::queue <COORDENADAS> vecCoord;
 
-	COORDENADAS mcoordenadaAnterior;
+//	COORDENADAS mcoordenadaAnterior;
 	COORDENADAS mcoordenadaAtual;
-	double mdistanciaAcumulada;
 	double mdistancia10Km;
+	double mdistanciaMarcoAnterior;
+	boost::thread mthread;
 
 
-	double ControleDeDistanciaDeMarco(COORDENADAS coordenadaAtual);
+	double ControleDeDistanciaDeMarco(COORDENADAS cAtual, COORDENADAS cAnterior);
 	double CalculaDistanciaHaversine(COORDENADAS ponto1, COORDENADAS ponto2);
 	double ConverteGrausParaRadianos (double graus);
-	void SalvarMarcoAtual(MARCO marco);
-	void SalvarMarcoInicial(MARCO marco);
-	void GetCoordenadas(COORDENADAS &dados);
+	bool GetCoordenadas(COORDENADAS &dados, bool retiraDaFila);
+	int GetNumCoordenadas();
+	void GravaMarco(string tag, PN_DATA pn);
+
+	static void Thread(CtrlMarcoQuilometrico *ctrlMq);
+	void Run();
 
 public:
 	CtrlMarcoQuilometrico(Model *model);
 	
 	void Notify(Subject *p);
-	void EventoSalvarMarcoManual();
+
+	void ProcessaMQ(PN_DATA pn);
+	void SalvaMarcoAtual(int marco);
+
 };
 
 
