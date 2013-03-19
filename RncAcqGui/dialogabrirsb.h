@@ -13,7 +13,6 @@ public:
 
 	bool SelecaoSentido(PN_SENTIDO &pntipo);
 	bool SelecaoInicio(PN_INICIOTIPO &pntipo);
-	bool SelecaoDesvio(PN_DESVIO &pntipo);
 	QString Marco();
 	QString Sb();
 

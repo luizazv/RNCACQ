@@ -3,9 +3,6 @@
 
 #include <string>
 
-//tempo que deve aguardar parado para marcar o pontos (em segundos)
-#define TEMPO_LEITURA_DE_PONTO_NOTAVEL	20
-
 enum ModoGravacao
 {
 	MODO_PAUSADO,
@@ -24,25 +21,22 @@ enum PN_TIPO
 	PN_FIMSB,
 	PN_MARCO,
 	PN_MARCOAUTOMATICO,
-	PN_MARCOINICIAL
+	PN_MARCOINICIAL,
+	PN_COORDENADAS,
+	PN_NENHUM
 };
 
 enum PN_INICIOTIPO
 {
 	PN_INICIO_MARCO,
-	PN_INICIO_CHAVE
+	PN_DESVIO_DIREITA,
+	PN_DESVIO_ESQUERDA
 };
 
 enum PN_SENTIDO
 {
 	PN_CRESCENTE,
 	PN_DECRESCENTE
-};
-
-enum PN_DESVIO
-{
-	PN_DESVIO_DIREITA,
-	PN_DESVIO_ESQUERDA
 };
 
 enum PN_CHAVE
@@ -59,7 +53,6 @@ struct PN_DATA
 	PN_TIPO pntipo;
 	PN_INICIOTIPO pntipoinicio;
 	PN_SENTIDO pnsentido;
-	PN_DESVIO pndesvio;
 	PN_CHAVE pnchave;
 };
 
@@ -69,6 +62,12 @@ struct COORDENADAS
 	long longitude;
 	double velocidade;
 	double altitude;
+};
+
+struct GUI_DATA
+{
+	COORDENADAS coord;
+	PN_DATA pn;
 };
 
 
@@ -117,7 +116,7 @@ public:
 	void GuiSetHdop(float valor);
 	void GuiSendMsg(const char *msg, int timer = 0);
 	void GuiSetDistanciaProximoMarco(int distancia);
-	void GuiPlota(COORDENADAS coord);
+	void GuiPlota(COORDENADAS coord, PN_DATA pn);
 };
 
 

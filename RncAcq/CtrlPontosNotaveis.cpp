@@ -119,7 +119,7 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 
 	case PN_PASSAGEMNIVEL:
 		SetPassagemNivel();
-		mmodel->GuiSendMsg("Gravando Passagem de Nivel", 4000);
+		mmodel->GuiSendMsg("Aguarde! Gravando Passagem de Nivel", 3000);
 	break;
 	}
 }
@@ -129,24 +129,47 @@ void CtrlPontosNotaveis::ProcessaPN(PN_DATA pnData)
 void CtrlPontosNotaveis::SetPassagemNivel()
 {
 	stringstream strgpsdado;
-	COORDENADAS gpsData = GetDadosGps();
 
-	strgpsdado << string("LATITUDE: ") << gpsData.latitude << ", LONGITUDE: " << gpsData.longitude << ", ALTITUDE: " << gpsData.altitude;
-
+	COORDENADAS gpsData;
+	
+	if(GetCoordenadas(gpsData))
+	{
+		strgpsdado << "LATITUDE: " << gpsData.latitude << ", LONGITUDE: " << gpsData.longitude << ", ALTITUDE: " << gpsData.altitude;
+	}
+	else
+	{
+		strgpsdado << "COORDENADAS NAO DISPONIVEIS";
+	}
+	
 	std::string header;
 
 	header = strgpsdado.str();
 
+	PN_DATA data;
+
+	data.pntipo = PN_PASSAGEMNIVEL;
+
+	mmodel->GuiPlota(gpsData, data);
+
 	LogMgr::GetInstance()->Escreve("PN_PASSAGEMNIVEL", header);
+
 }
 
 
 //---------------------------------------------------------------------------
-COORDENADAS CtrlPontosNotaveis::GetDadosGps()
+bool CtrlPontosNotaveis::GetCoordenadas(COORDENADAS &coordenadas)
 {
+	bool retval = false;
+
 	boost::lock_guard<boost::mutex> guard (gpsMutex);
-	mdadoGpsNovo = false;
-	return mgpsData;
+	if(mdadoGpsNovo)
+	{
+		retval = true;
+		mdadoGpsNovo = false;
+		coordenadas = mgpsData;
+	}
+
+	return retval;
 }
 
 //---------------------------------------------------------------------------
@@ -160,14 +183,14 @@ void CtrlPontosNotaveis::Run()
 {
 	stringstream strdado;
 	string tag;
+	COORDENADAS gpsData;
 
 	switch(mpnData.pntipo)
 	{
 		case PN_INICIOSB:
 			strdado << "SB: " << mpnData.Sb\
-			<< ", INICIO TIPO: " << ((mpnData.pntipoinicio == PN_INICIO_MARCO) ? "PN_INICIO_MARCO" : "PN_INICIO_CHAVE")\
+			<< ", INICIO TIPO: " << ((mpnData.pntipoinicio == PN_INICIO_MARCO) ? "PN_INICIO_MARCO" : ((mpnData.pntipoinicio == PN_DESVIO_ESQUERDA) ? "PN_DESVIO_ESQUERDA" : "PN_DESVIO_DIREITA"))\
 			<< ", SENTIDO: " << ((mpnData.pnsentido == PN_CRESCENTE) ? "PN_CRESCENTE" : "PN_DECRESCENTE")\
-			<< ", DESVIO: " << ((mpnData.pndesvio == PN_DESVIO_DIREITA) ? "PN_DESVIO_DIREITA" : "PN_DESVIO_ESQUERDA")\
 			<< ", MARCO: " << mpnData.Marco << ", ";
 
 			tag = "PN_INICIOSB";
@@ -208,22 +231,27 @@ void CtrlPontosNotaveis::Run()
 	{
 		if(mdadoGpsNovo)
 		{
-			COORDENADAS gpsData = GetDadosGps();
+			if(GetCoordenadas(gpsData))
+			{
+				stringstream strgpsdado;
+				strgpsdado << string("LATITUDE: ") << gpsData.latitude << ", LONGITUDE: " << gpsData.longitude << ", ALTITUDE: " << gpsData.altitude;
 
-			stringstream strgpsdado;
-			strgpsdado << string("LATITUDE: ") << gpsData.latitude << ", LONGITUDE: " << gpsData.longitude << ", ALTITUDE: " << gpsData.altitude;
+				std::string header2 = strgpsdado.str();
 
-			std::string header2 = strgpsdado.str();
-
-			LogMgr::GetInstance()->Escreve(tag, header1 + header2);
+				LogMgr::GetInstance()->Escreve(tag, header1 + header2);
+			}
 		}
 
 		//verifica se ultrapassou 20 segundos
 	    boost::posix_time::ptime t2 = boost::posix_time::second_clock::local_time();
 		boost::posix_time::time_duration diff = t2 - t1;
+
 		if( diff.total_seconds() > TEMPO_LEITURA_DE_PONTO_NOTAVEL)
 		{
 			mterminateThread = true;
+			//mostra ponto notavel na tela
+			mmodel->GuiPlota(gpsData, mpnData);
+
 		}
 		else
 		{

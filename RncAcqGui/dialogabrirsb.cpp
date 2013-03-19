@@ -19,37 +19,25 @@ void DialogAbrirSB::on_lineEditSb_textChanged(const QString &arg1)
 
 bool DialogAbrirSB::SelecaoInicio(PN_INICIOTIPO &pntipo)
 {
-	bool selection;
+    bool select = false;
 
-	bool select = ((selection = radioButtonChave->isChecked()) || radioButtonMarco->isChecked());
-
-	pntipo = selection ? PN_INICIO_CHAVE : PN_INICIO_MARCO;
-
-	return select;
-}
-
-bool DialogAbrirSB::SelecaoSentido(PN_SENTIDO &pntipo)
-{
-	bool selection;
-
-	bool select = ((selection = radioButtonCrescente->isChecked()) || radioButtonDecrescente->isChecked());
-
-	pntipo = selection ? PN_CRESCENTE : PN_DECRESCENTE;
-
-	return select;
-
-}
-
-bool DialogAbrirSB::SelecaoDesvio(PN_DESVIO &pntipo)
-{
-	bool selection;
-
-	bool select = ((selection = radioButtonDireita->isChecked()) || radioButtonEsquerda->isChecked());
-
-	pntipo = selection ? PN_DESVIO_DIREITA : PN_DESVIO_ESQUERDA;
+    if(radioButtonChaveDireita->isChecked())
+    {
+        pntipo = PN_DESVIO_DIREITA;
+        select = true;
+    }
+    else if(radioButtonChaveEsquerda->isChecked())
+    {
+        pntipo = PN_DESVIO_ESQUERDA;
+        select = true;
+    }
+    else
+    {
+        pntipo = PN_INICIO_MARCO;
+        select = true;
+    }
 
 	return select;
-
 }
 
 QString DialogAbrirSB::Marco()

@@ -92,7 +92,10 @@ void CtrlCoordenadas::Run()
 			if(ExecutaProcessamento())
 			{
 				//plota na tela principal
-				mmodel->GuiPlota(mdadosCoordenadas);
+				PN_DATA pn;
+				pn.pntipo = PN_COORDENADAS;
+
+				mmodel->GuiPlota(mdadosCoordenadas, pn);
 
 				//notifica observers
 				NotifyObservers();

@@ -27,7 +27,7 @@ public:
 	virtual void SetHdop(int valor) = 0;
 	virtual void SendMsg(const char *msg, int timer) = 0;
 	virtual void SetDistanciaProximoMarco(int dist) = 0;
-	virtual void Plota(COORDENADAS coord) = 0;
+	virtual void Plota(COORDENADAS coord, PN_DATA pn) = 0;
 };
 
 

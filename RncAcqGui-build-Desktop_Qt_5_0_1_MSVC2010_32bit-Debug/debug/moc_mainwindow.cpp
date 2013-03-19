@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[24];
-    char stringdata[477];
+    QByteArrayData data[22];
+    char stringdata[459];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,29 +36,26 @@ QT_MOC_LITERAL(3, 23, 11),
 QT_MOC_LITERAL(4, 35, 3),
 QT_MOC_LITERAL(5, 39, 5),
 QT_MOC_LITERAL(6, 45, 16),
-QT_MOC_LITERAL(7, 62, 11),
-QT_MOC_LITERAL(8, 74, 5),
-QT_MOC_LITERAL(9, 80, 13),
-QT_MOC_LITERAL(10, 94, 19),
-QT_MOC_LITERAL(11, 114, 24),
-QT_MOC_LITERAL(12, 139, 21),
-QT_MOC_LITERAL(13, 161, 26),
-QT_MOC_LITERAL(14, 188, 26),
-QT_MOC_LITERAL(15, 215, 23),
-QT_MOC_LITERAL(16, 239, 29),
-QT_MOC_LITERAL(17, 269, 26),
-QT_MOC_LITERAL(18, 296, 26),
-QT_MOC_LITERAL(19, 323, 28),
-QT_MOC_LITERAL(20, 352, 28),
-QT_MOC_LITERAL(21, 381, 28),
-QT_MOC_LITERAL(22, 410, 33),
-QT_MOC_LITERAL(23, 444, 31)
+QT_MOC_LITERAL(7, 62, 13),
+QT_MOC_LITERAL(8, 76, 19),
+QT_MOC_LITERAL(9, 96, 24),
+QT_MOC_LITERAL(10, 121, 21),
+QT_MOC_LITERAL(11, 143, 26),
+QT_MOC_LITERAL(12, 170, 26),
+QT_MOC_LITERAL(13, 197, 23),
+QT_MOC_LITERAL(14, 221, 29),
+QT_MOC_LITERAL(15, 251, 26),
+QT_MOC_LITERAL(16, 278, 26),
+QT_MOC_LITERAL(17, 305, 28),
+QT_MOC_LITERAL(18, 334, 28),
+QT_MOC_LITERAL(19, 363, 28),
+QT_MOC_LITERAL(20, 392, 33),
+QT_MOC_LITERAL(21, 426, 31)
     },
     "MainWindow\0AbreMsgBox\0\0const char*\0"
-    "msg\0timer\0PlotaCoordenadas\0COORDENADAS\0"
-    "coord\0on_AbreMsgBox\0on_PlotaCoordenadas\0"
-    "on_ButtonIniciar_clicked\0on_ButtonStop_clicked\0"
-    "on_pushButtonPonte_clicked\0"
+    "msg\0timer\0PlotaCoordenadas\0on_AbreMsgBox\0"
+    "on_PlotaCoordenadas\0on_ButtonIniciar_clicked\0"
+    "on_ButtonStop_clicked\0on_pushButtonPonte_clicked\0"
     "on_pushButtonTunel_clicked\0"
     "on_pushButtonPN_clicked\0"
     "on_pushButtonInicioSb_clicked\0"
@@ -87,32 +84,32 @@ static const uint qt_meta_data_MainWindow[] = {
 
  // signals: name, argc, parameters, tag, flags
        1,    2,   99,    2, 0x05,
-       6,    1,  104,    2, 0x05,
+       6,    0,  104,    2, 0x05,
 
  // slots: name, argc, parameters, tag, flags
-       9,    2,  107,    2, 0x0a,
-      10,    1,  112,    2, 0x0a,
-      11,    0,  115,    2, 0x08,
-      12,    0,  116,    2, 0x08,
-      13,    0,  117,    2, 0x08,
-      14,    0,  118,    2, 0x08,
-      15,    0,  119,    2, 0x08,
-      16,    0,  120,    2, 0x08,
-      17,    0,  121,    2, 0x08,
-      18,    0,  122,    2, 0x08,
-      19,    0,  123,    2, 0x08,
-      20,    0,  124,    2, 0x08,
-      21,    0,  125,    2, 0x08,
-      22,    0,  126,    2, 0x08,
-      23,    0,  127,    2, 0x08,
+       7,    2,  105,    2, 0x0a,
+       8,    0,  110,    2, 0x0a,
+       9,    0,  111,    2, 0x08,
+      10,    0,  112,    2, 0x08,
+      11,    0,  113,    2, 0x08,
+      12,    0,  114,    2, 0x08,
+      13,    0,  115,    2, 0x08,
+      14,    0,  116,    2, 0x08,
+      15,    0,  117,    2, 0x08,
+      16,    0,  118,    2, 0x08,
+      17,    0,  119,    2, 0x08,
+      18,    0,  120,    2, 0x08,
+      19,    0,  121,    2, 0x08,
+      20,    0,  122,    2, 0x08,
+      21,    0,  123,    2, 0x08,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, QMetaType::Int,    4,    5,
-    QMetaType::Void, 0x80000000 | 7,    8,
+    QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void, 0x80000000 | 3, QMetaType::Int,    4,    5,
-    QMetaType::Void, 0x80000000 | 7,    8,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -136,9 +133,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         MainWindow *_t = static_cast<MainWindow *>(_o);
         switch (_id) {
         case 0: _t->AbreMsgBox((*reinterpret_cast< const char*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 1: _t->PlotaCoordenadas((*reinterpret_cast< COORDENADAS(*)>(_a[1]))); break;
+        case 1: _t->PlotaCoordenadas(); break;
         case 2: _t->on_AbreMsgBox((*reinterpret_cast< const char*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 3: _t->on_PlotaCoordenadas((*reinterpret_cast< COORDENADAS(*)>(_a[1]))); break;
+        case 3: _t->on_PlotaCoordenadas(); break;
         case 4: _t->on_ButtonIniciar_clicked(); break;
         case 5: _t->on_ButtonStop_clicked(); break;
         case 6: _t->on_pushButtonPonte_clicked(); break;
@@ -164,7 +161,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
         {
-            typedef void (MainWindow::*_t)(COORDENADAS );
+            typedef void (MainWindow::*_t)();
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&MainWindow::PlotaCoordenadas)) {
                 *result = 1;
             }
@@ -218,9 +215,8 @@ void MainWindow::AbreMsgBox(const char * _t1, int _t2)
 }
 
 // SIGNAL 1
-void MainWindow::PlotaCoordenadas(COORDENADAS _t1)
+void MainWindow::PlotaCoordenadas()
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+    QMetaObject::activate(this, &staticMetaObject, 1, 0);
 }
 QT_END_MOC_NAMESPACE

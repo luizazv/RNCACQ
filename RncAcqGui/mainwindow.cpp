@@ -15,100 +15,7 @@
 #include "c:/dados/projetos daiken/rncacq/rncacq/MVP.h"
 #include "c:/dados/projetos daiken/rncacq/rncacq/Model.h"
 
-
-/*
-class FrameNav : public QFrame
-{
-private:
-    struct COORDENADAS
-    {
-        int latitude;
-        int longitude;
-    };
-
-    vector <COORDENADAS> vecCoord;
-
-
-public:
-    FrameNav(QWidget *t) : QFrame(t)
-    {
-    }
-
-    void paintEvent(QPaintEvent *)
-    {
-        QPainter painter(this);
-
-        xp1++;
-        xp.push_back(xp1);
-        yp1++;
-        xy.push_back(yp1);
-
-
-        //First Circle:
-        //width&height:150px
-        //Beginning(x/y):50px/30px
-        //Each step for Angle parameter is 1/16th of a Degree
-        //so multiply Angle Value with 16
-        painter.drawArc(5,5, k+= 15,150,0,16*360);
-        painter.drawRect(0, 0, 10, 10);
-
-        for(unsigned int i = 0; i < xp.size(); i++)
-        {
-            painter.drawPoint(xp[i], xy[i]);
-        }
-    }
-
-
-    static bool ComparaLatitudeMaior(COORDENADAS coord1, COORDENADAS coord2)
-    {
-       bool retval = (coord1.latitude > coord2.latitude);
-       return retval;
-    }
-
-    static bool ComparaLongitudeMaior(COORDENADAS coord1, COORDENADAS coord2)
-    {
-       bool retval = (coord1.longitude > coord2.longitude);
-       return retval;
-    }
-
-    static bool ComparaLatitudeMenor(COORDENADAS coord1, COORDENADAS coord2)
-    {
-       bool retval = (coord1.latitude < coord2.latitude);
-       return retval;
-    }
-
-    static bool ComparaLongitudeMenor(COORDENADAS coord1, COORDENADAS coord2)
-    {
-       bool retval = (coord1.longitude < coord2.longitude);
-       return retval;
-    }
-
-    void AddPontos(int latitude, int longitude)
-    {
-        vector <COORDENADAS>::iterator itLatitudeMaior;
-        vector <COORDENADAS>::iterator itLongitudeMaior;
-        vector <COORDENADAS>::iterator itLatitudeMenor;
-        vector <COORDENADAS>::iterator itLongitudeMenor;
-
-        //encontro maior longitude e menor longitude->tentativa de manter a imagem no meio
-        itLatitudeMaior = max_element(vecCoord.begin(), vecCoord.end(), ComparaLatitudeMaior);
-        itLongitudeMaior = max_element(vecCoord.begin(), vecCoord.end(), ComparaLongitudeMaior);
-
-        itLatitudeMenor = min_element(vecCoord.begin(), vecCoord.end(), ComparaLatitudeMenor);
-        itLongitudeMenor = min_element(vecCoord.begin(), vecCoord.end(), ComparaLongitudeMenor);
-
-        //delta entre latitudes
-        int latdelta = (*itLatitudeMaior).latitude - (*itLatitudeMenor).latitude;
-        int longdelta = (*itLongitudeMaior).longitude - (*itLongitudeMenor).longitude;
-
-        //latitude menor no canto inferior esquerdo + 10 pixels
-    }
-
-};
-*/
-
 FrameNav *frameNav;
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -117,11 +24,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     frameNav = new FrameNav(frameBase);
     frameNav->setGeometry(frameBase->geometry());
+    frameNav->setGeometry(QRect(0, 0, frameBase->width(), frameBase->height()));
+
+	int w = frameNav->width() / 2;
+	int h = frameNav->height() / 2;
+
+	frameNav->SetCursor(w, h);
+	frameNav->SetOrigem(w, h);
     frameNav->setFrameShape(QFrame::NoFrame);
     frameNav->setFrameShadow(QFrame::Sunken);
 
     mdistanciaUltimoMarco = 0;
     mmarcoAtual = 0;
+
+	//conecta signal e slot para evitar que thread atue sobre a janela principal
+    connect(this, SIGNAL(PlotaCoordenadas()), this, SLOT(on_PlotaCoordenadas()));
+
+	//conecta signal e slot para evitar que thread atue sobre a janela principal
+    connect(this, SIGNAL(AbreMsgBox(const char*, int)), this, SLOT(on_AbreMsgBox(const char*, int)));
 }
 
 void MainWindow::AtivaBarraLeds()
@@ -257,23 +177,21 @@ void MainWindow::SetHdop(int valor)
 	horizontalSliderHdop->setValue(valor);
 }
 
-void MainWindow::on_PlotaCoordenadas(COORDENADAS coord)
+void MainWindow::on_PlotaCoordenadas()
 {
-/*	//adiciona no vetor de coordenadas
-	frameNav->AddPontos(
-
 	//plota na metade da tela 
 	frameNav->repaint();
-*/
 }
 
-void MainWindow::Plota(COORDENADAS coord)
+void MainWindow::Plota(COORDENADAS coord, PN_DATA pn)
 {
-	//conecta signal e slot para evitar que thread atue sobre a janela principal
-    connect(this, SIGNAL(PlotaCoordenadas(COORDENADAS)), this, SLOT(on_PlotaCoordenadas(COORDENADAS)));
+	//adiciona no vetor de coordenadas
+	frameNav->AddPontos(coord, pn);
 
-	//envia sinal on_MsgBox_clicked
-    emit PlotaCoordenadas(coord);
+	//conecta signal e slot para evitar que thread atue sobre a janela principal
+//    connect(this, SIGNAL(PlotaCoordenadas()), this, SLOT(on_PlotaCoordenadas()));
+
+	emit PlotaCoordenadas();
 }
 
 
@@ -302,9 +220,6 @@ void MainWindow::on_AbreMsgBox(const char *msg, int timer)
 
 void MainWindow::SendMsg(const char *msg, int timer)
 {
-	//conecta signal e slot para evitar que thread atue sobre a janela principal
-    connect(this, SIGNAL(AbreMsgBox(const char*, int)), this, SLOT(on_AbreMsgBox(const char*, int)));
-
 	//envia sinal on_MsgBox_clicked
     emit AbreMsgBox(msg, timer);
 }
@@ -398,16 +313,6 @@ void MainWindow::on_pushButtonInicioSb_clicked()
 
 		//select = true-> um dos elementos foi selecionado
 		bool select = dialogAbrir.SelecaoInicio(pn.pntipoinicio);
-
-		if(select)
-		{
-			select = dialogAbrir.SelecaoDesvio(pn.pndesvio);
-		}
-
-		if(select)
-		{
-			select = dialogAbrir.SelecaoSentido(pn.pnsentido);
-		}
 
 		//verifica se algum dos radiobutton está selecionado
 		if(select)

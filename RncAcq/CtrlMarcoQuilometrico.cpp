@@ -15,7 +15,7 @@ CtrlMarcoQuilometrico::CtrlMarcoQuilometrico(Model *model)
 	mmarcoInicialGravado = false;
 	mdistanciaMarcoAnterior = 0;
 	mdistancia10Km = 0;
-	mthread = boost::thread(Thread, this);
+//	mthread = boost::thread(Thread, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -91,11 +91,15 @@ void CtrlMarcoQuilometrico::Notify(Subject *p)
 	static bool primeiracoordenada = true;
 	COORDENADAS coord;
 
-	//processamento de marco->notificado pela thread ctrlCoordenadas
-	boost::lock_guard <boost::mutex> guard (mqMutex);
-	//guarda coordenada
+	//guarda coordenada->notificado pela thread ctrlCoordenadas
 	((CtrlCoordenadas *)p)->GetCoordenadas(coord);
+
+
+	boost::lock_guard <boost::mutex> guard (mqMutex);
+	//adiciona no vetor de coordenadas
 	vecCoord.push(coord);
+	//thread de processamento de marco
+	boost::thread(Thread, this);
 }
 
 //---------------------------------------------------------------------------
@@ -144,27 +148,44 @@ void CtrlMarcoQuilometrico::ProcessaMQ(PN_DATA pnData)
 void CtrlMarcoQuilometrico::GravaMarco(string tag, PN_DATA pnData)
 {
 	stringstream strgpsdado;
+	bool coordDisponivel = false;
+	COORDENADAS coord;
 
 	//atualiza marco atual
 	mmarcoAnterior = mmarcoAtual;
 
+	if(GetNumCoordenadas() > 0)
+	{
+		//verificação de segurança, sempre haverá coordenada no buffer
+		GetCoordenadas(coord, false);
+		coordDisponivel = true;
+	}
+
 	stringstream(pnData.Marco) >> mmarcoAtual;
 
 	strgpsdado << "MARCO: " << pnData.Marco;
+
+	if(coordDisponivel)
+	{
+		strgpsdado << ", LATITUDE: " << coord.latitude << ", LONGITUDE: " << coord.longitude << ", ALTITUDE: " << coord.altitude;
+	}
+	else
+	{
+		strgpsdado << "COORDENADAS NAO DISPONIVEIS";
+	}
 
 	std::string header;
 
 	header = strgpsdado.str();
 
 	LogMgr::GetInstance()->Escreve(tag, header);
-}
 
-boost::mutex xmutex;
+	mmodel->GuiPlota(coord, pnData);
+}
 
 //---------------------------------------------------------------------------
 void CtrlMarcoQuilometrico::Thread(CtrlMarcoQuilometrico *ctrlMq)
 {
-	boost::lock_guard < boost::mutex > guard (xmutex);
 	ctrlMq->Run();
 }
 
@@ -177,9 +198,9 @@ double CtrlMarcoQuilometrico::ControleDeDistanciaDeMarco(COORDENADAS coordAtual,
 	//calcula distancia entre duas coordenadas
 	double distancia = 0;
 
-	if(coordAtual.velocidade > 0)
+	if(coordAtual.velocidade > 5)
 	{
-		//altera distancia apenas se velocidade diferente de zero->evita flutuações no sinal
+		//altera distancia apenas com velocidade->evita flutuações no sinal
 		//alterando distancia
 		distancia = CalculaDistanciaHaversine(coordAnterior, coordAtual);
 
@@ -199,6 +220,9 @@ double CtrlMarcoQuilometrico::ControleDeDistanciaDeMarco(COORDENADAS coordAtual,
 		//envia para LogMgr gravar marco
 		GravaMarco("PN_MARCOINICIAL", pn);
 		mmodel->GuiSendMsg("Aguarde: Gravando Marco Inicial", 3000);
+
+		mmodel->GuiPlota(coordAtual, pn);
+
 	
 		mmarcoInicialGravado = true;
 	}
@@ -233,22 +257,24 @@ double CtrlMarcoQuilometrico::ControleDeDistanciaDeMarco(COORDENADAS coordAtual,
 //---------------------------------------------------------------------------
 void CtrlMarcoQuilometrico::Run()
 {
+	//evita rodar duas instancias de thread ao mesmo tempo
+	boost::lock_guard <boost::mutex> guard(mthreadMutex);
+
 	//thread que controla marco automatico e aviso de parada a cada 10 Km
 	COORDENADAS coordAtual;
 	COORDENADAS coordAnterior;
 	double distMarcoAnterior;
 	
-	while(1)
+	while(GetNumCoordenadas() > 1)
 	{
-		int Num = GetNumCoordenadas();
-
-		if(GetNumCoordenadas() > 1)
+//		if(GetNumCoordenadas() > 1)
 		{
 			//pego coordenada anterior (ser houver mais de duas disponiveis)
 			if(GetCoordenadas(coordAnterior, true))
 			{
-				int Num = GetNumCoordenadas();
-				//tento pegar a coordenada atual -> não retira da fila para proximo processamento
+//				int Num = GetNumCoordenadas();
+				//tento pegar a coordenada atual -> não retira da fila,
+				//se torna anterior no proximo processamento
 				if(GetCoordenadas(coordAtual, false))
 				{
 					//controle de distancias entre marcos
@@ -258,7 +284,6 @@ void CtrlMarcoQuilometrico::Run()
 				}
 			}
 		}
-
-		boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+//		boost::this_thread::sleep(boost::posix_time::milliseconds(200));
 	}
 }

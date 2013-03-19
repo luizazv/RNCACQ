@@ -96,9 +96,9 @@ void Model::GuiSetDistanciaProximoMarco(int distancia)
 }
 
 //-----------------------------------------------------------------------------
-void Model::GuiPlota(COORDENADAS coord)
+void Model::GuiPlota(COORDENADAS coord, PN_DATA pndata)
 {
-	mview->Plota(coord);
+	mview->Plota(coord, pndata);
 }
 
 //-----------------------------------------------------------------------------

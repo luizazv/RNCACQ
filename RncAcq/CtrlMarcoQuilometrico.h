@@ -35,14 +35,15 @@ private:
 	int mmarcoAtual;
 	Model *mmodel;
 	boost::mutex mqMutex;
+	boost::mutex mthreadMutex;
 	bool mmarcoInicialGravado;
 	std::queue <COORDENADAS> vecCoord;
 
 //	COORDENADAS mcoordenadaAnterior;
-	COORDENADAS mcoordenadaAtual;
+//	COORDENADAS mcoordenadaAtual;
 	double mdistancia10Km;
 	double mdistanciaMarcoAnterior;
-	boost::thread mthread;
+//	boost::thread mthread;
 
 
 	double ControleDeDistanciaDeMarco(COORDENADAS cAtual, COORDENADAS cAnterior);

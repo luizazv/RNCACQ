@@ -4,7 +4,6 @@
 #include "ui_mainwindow.h"
 #include "c:/Dados/Projetos Daiken/RncAcq/RncAcq/MVP.h"
 
-
 class MainWindow : public QMainWindow, private Ui::MainWindow, public View
 {
     Q_OBJECT
@@ -19,7 +18,7 @@ public:
 	void SetHdop(int valor);
 	void SendMsg(const char *msg, int timer = 0);
 	void SetDistanciaProximoMarco(int distancia);
-	void Plota(COORDENADAS coord);
+	void Plota(COORDENADAS coord, PN_DATA pn);
 
 private:
 	enum EstadoGPS
@@ -38,12 +37,14 @@ private:
 
 signals:
    void AbreMsgBox(const char *msg, int timer);
-   void PlotaCoordenadas(COORDENADAS coord);
+   void PlotaCoordenadas();
+//   void PlotaCoordenadas(const char *coord, int pn);
 
 
 public slots:
     void on_AbreMsgBox(const char *msg, int timer);
-	void on_PlotaCoordenadas(COORDENADAS coord);
+	void on_PlotaCoordenadas();
+//	void on_PlotaCoordenadas(const char *coord, int pn);
 
 private slots:
     void on_ButtonIniciar_clicked();

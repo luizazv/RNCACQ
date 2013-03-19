@@ -7,6 +7,9 @@
 #include "Gps.h"
 #include "CtrlCoordenadas.h"
 
+//tempo que deve aguardar parado para marcar o pontos (em segundos)
+#define TEMPO_LEITURA_DE_PONTO_NOTAVEL	3
+
 class CtrlPontosNotaveis : public Observer
 {
 private:
@@ -21,7 +24,7 @@ private:
 	static void Thread(CtrlPontosNotaveis *);
 	void SetMarco();
 	void SetPassagemNivel();
-	COORDENADAS GetDadosGps();
+	bool GetCoordenadas(COORDENADAS &coord);
 	void SetDadosGps(COORDENADAS data);
 
 public:
