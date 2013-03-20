@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QtCore\QMutex>
 #include "ui_mainwindow.h"
 #include "c:/Dados/Projetos Daiken/RncAcq/RncAcq/MVP.h"
 
@@ -21,6 +22,8 @@ public:
 	void Plota(COORDENADAS coord, PN_DATA pn);
 
 private:
+	QMutex mutex;
+
 	enum EstadoGPS
 	{
 		ESTADO_VERMELHO,
@@ -33,7 +36,6 @@ private:
     int mproximoMarco;
 
 	std::vector< std::string > ListaSbsAbertas;
-    void AtivaBarraLeds();
 
 signals:
    void AbreMsgBox(const char *msg, int timer);
@@ -44,7 +46,6 @@ signals:
 public slots:
     void on_AbreMsgBox(const char *msg, int timer);
 	void on_PlotaCoordenadas();
-//	void on_PlotaCoordenadas(const char *coord, int pn);
 
 private slots:
     void on_ButtonIniciar_clicked();

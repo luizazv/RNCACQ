@@ -17,6 +17,10 @@
 
 FrameNav *frameNav;
 
+static COORDENADAS tempCoord;
+static PN_DATA tempPn;
+static float tempVel;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -29,8 +33,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	int w = frameNav->width() / 2;
 	int h = frameNav->height() / 2;
 
-	frameNav->SetCursor(w, h);
-	frameNav->SetOrigem(w, h);
     frameNav->setFrameShape(QFrame::NoFrame);
     frameNav->setFrameShadow(QFrame::Sunken);
 
@@ -42,60 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	//conecta signal e slot para evitar que thread atue sobre a janela principal
     connect(this, SIGNAL(AbreMsgBox(const char*, int)), this, SLOT(on_AbreMsgBox(const char*, int)));
-}
-
-void MainWindow::AtivaBarraLeds()
-{
-    static int led = 0;
-    static bool direcao = true;
-
-    QPixmap px;
-
-    QPainter p(&px);
-
-    switch(led)
-    {
-        case 0:
-            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led1.bmp");
-        break;
-        case 1:
-            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led2.bmp");
-        break;
-        case 2:
-            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led3.bmp");
-        break;
-        case 3:
-            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led4.bmp");
-        break;
-        case 4:
-            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led5.bmp");
-        break;
-        case 5:
-            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led6.bmp");
-        break;
-        case 6:
-            px.load("c:\\dados\\projetos daiken\\rncacq\\imagens\\led7.bmp");
-        break;
-    }
-
-    labelLed->setPixmap(px);
-
-    if(direcao)
-    {
-        if(++led >= 6)
-        {
-            direcao = false;
-            led = 5;
-        }
-    }
-    else
-    {
-        if(--led < 0)
-        {
-            direcao = true;
-            led = 1;
-        }
-    }
 }
 
 void MainWindow::SentencaOk()
@@ -113,8 +61,6 @@ void MainWindow::SentencaOk()
 		ButtonStop->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
-
-    AtivaBarraLeds();
 }
 
 void MainWindow::ErroGpsSentencaInvalida()
@@ -132,8 +78,6 @@ void MainWindow::ErroGpsSentencaInvalida()
 		ButtonStop->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
-
-    AtivaBarraLeds();
 }
 
 void MainWindow::ErroGpsFalhaSentenca()
@@ -151,8 +95,6 @@ void MainWindow::ErroGpsFalhaSentenca()
 		ButtonStop->setEnabled(true);
 		ButtonIniciar->setEnabled(false);
 	}
-
-    AtivaBarraLeds();
 }
 
 void MainWindow::ErroGps()
@@ -179,18 +121,47 @@ void MainWindow::SetHdop(int valor)
 
 void MainWindow::on_PlotaCoordenadas()
 {
+	static bool backgroundRed = false;
+	//adiciona no vetor de coordenadas
+	mutex.lock();
+	frameNav->AddPontos(tempCoord, tempPn);
+	mutex.unlock();
+
+	//atualiza velocidade
+    lcdNumberVel->display(tempVel);
+	//verifica se vel > 30
+	if(tempVel > 30)
+	{
+		if(backgroundRed == false)
+		{
+			lcdNumberVel->setStyleSheet("background-color: red");
+			backgroundRed = true;
+		}
+	}
+	else
+	{
+		if(backgroundRed == true)
+		{
+			lcdNumberVel->setStyleSheet("background-color: rgb(217, 217, 217)");
+			backgroundRed = false;
+		}
+	}
+
 	//plota na metade da tela 
 	frameNav->repaint();
 }
 
 void MainWindow::Plota(COORDENADAS coord, PN_DATA pn)
 {
-	//adiciona no vetor de coordenadas
-	frameNav->AddPontos(coord, pn);
+	//signals com estruturas como parâmetros não consegue ativar o slot
+	//usar variável temporaria para passar parametros complexos para GUI
+	mutex.lock();
+	tempCoord = coord;
+	tempPn = pn;
+	tempVel = coord.velocidade;
+	mutex.unlock();
 
-	//conecta signal e slot para evitar que thread atue sobre a janela principal
-//    connect(this, SIGNAL(PlotaCoordenadas()), this, SLOT(on_PlotaCoordenadas()));
-
+	//aciona slot on_plotaCoordenadas
 	emit PlotaCoordenadas();
 }
 
@@ -324,7 +295,7 @@ void MainWindow::on_pushButtonInicioSb_clicked()
 		}
 		else
 		{
-            QMessageBox::information(this, "ATENCAO", "FALTOU SELECIONAR ALGUM ELEMENTO AO MARCAR FECHAMENTO DE SB");
+            QMessageBox::information(this, "ATENCAO", "FALTOU SELECIONAR ALGUM ELEMENTO AO MARCAR ABERTURA DE SB");
 		}
     }
 }
@@ -366,7 +337,7 @@ void MainWindow::on_pushButtonFimSb_clicked()
         }
         else
         {
-            QMessageBox::information(this, "ATENCAO", "FALTOU SELECIONAR ALGUM ELEMENTO AO MARCAR ABERTURA DE SB");
+            QMessageBox::information(this, "ATENCAO", "FALTOU SELECIONAR ALGUM ELEMENTO AO MARCAR FECHAMENTO DE SB");
         }
     }
 }

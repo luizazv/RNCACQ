@@ -31,10 +31,19 @@ bool DialogAbrirSB::SelecaoInicio(PN_INICIOTIPO &pntipo)
         pntipo = PN_DESVIO_ESQUERDA;
         select = true;
     }
-    else
+    else if(radioButtonMarco->isChecked())
     {
         pntipo = PN_INICIO_MARCO;
         select = true;
+    }
+
+    if(select == true)
+    {
+        //aceita SB com nome igual ou superior a tres digitos
+        if(lineEditSb->text().size() < 3)
+        {
+            select = false;
+        }
     }
 
 	return select;

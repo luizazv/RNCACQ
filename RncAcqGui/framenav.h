@@ -16,6 +16,22 @@
 #define COORDY_DELTA			80
 //coordenada dos pontos notaveis
 #define COORDY_PN				COORDY_LINHAPRINCIPAL + 50
+//largura da barra de PN em pixels
+#define TAM_PN					12
+//largura da barra de sb + linha principal
+#define TAM_SB					24
+
+//guarda começos das sbs
+//para desenhar quando começo naõ
+//estiver mais no vetor
+
+struct INICIOFIM_SB
+{
+	std::string nomeSb;
+	int coordY;
+	int delta;
+	PN_INICIOTIPO tipoinicio;
+};
 
 
 class FrameNav : public QFrame
@@ -23,6 +39,7 @@ class FrameNav : public QFrame
 private:
 
     std::vector <GUI_DATA> mvecGuiData;
+	std::vector <INICIOFIM_SB> comecoSb;
 
 	int mCursorX;
 	int mCursorY;
@@ -40,17 +57,13 @@ private:
 	void DesenhaCursor(QPainter &painter);
 	void DesenhaPontosNotaveis(QPainter &painter);
 	void DesenhaSb(QPainter &painter, int x1, int coordy, int x2, std::string nomeSb);
-	void DesenhaLinhaPrincipal(QPainter &painter, int x1, int coordy, int x2);
-
-	void ConverteOrigemX(int xCartesiano, int &xOrigem);
-	void ConverteOrigemY(int yCartesiano, int &yOrigem);
+	void DesenhaLinhaPrincipal(QPainter &painter, int x1, int x2);
+	void DesenhaPn(QPainter &painter, int x1, int x2, PN_TIPO pn);
 
 public:
     FrameNav(QWidget *t);
 
     void AddPontos(COORDENADAS coord, PN_DATA pn);
-	void SetOrigem(int x, int y);
-	void SetCursor(int x, int y);
 
 };
 

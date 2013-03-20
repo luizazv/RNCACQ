@@ -13,79 +13,7 @@ void FrameNav::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-//	DesenhaCursor(painter);
-
 	DesenhaPontosNotaveis(painter);
-}
-
-void FrameNav::ConverteOrigemX(int xCartesiano, int &xOrigem)
-{
-	//converte coordenadas globais em sentido cartesiano normal
-	xOrigem = width() - xCartesiano;
-}
-
-void FrameNav::ConverteOrigemY(int yCartesiano, int &yOrigem)
-{
-	//converte coordenadas globais em sentido cartesiano normal
-	yOrigem = height() - yCartesiano;
-}
-
-void FrameNav::SetOrigem(int x, int y)
-{
-	//todos os pontos são referenciados à origem
-	mOrigemX = x;
-	mOrigemY = y;
-}
-
-/*
-void ConvertePontoRelacaoOrigem(int x, int y)
-{
-	//calcula ponto x, y em função do valor de origem e das
-	//coordenadas de origem de início da plotagem
-	//nesta versão é o centro do frame
-
-	int xnovo = (x - mOrigemX + width() / 2);
-	int ynovo = (y - mOrigemY + height() / 2);
-}*/
-
-void FrameNav::SetCursor(int x, int y)
-{
-	mCursorX = x;
-	mCursorY = y;
-}
-
-void FrameNav::DesenhaCursor(QPainter &painter)
-{
-	//desenha um cursor no centro do frame
-	painter.drawEllipse(QPoint(mCursorX, mCursorY), 10, 10);
-
-    painter.drawLine(mCursorX - 7, mCursorY + 7, mCursorX + 7, mCursorY - 7);
-	painter.drawLine(mCursorX - 7, mCursorY - 7, mCursorX + 7, mCursorY + 7);
-}
-
-
-bool FrameNav::ComparaLatitudeMaior(COORDENADAS coord1, COORDENADAS coord2)
-{
-   bool retval = (coord1.latitude > coord2.latitude);
-   return retval;
-}
-
-bool FrameNav::ComparaLongitudeMaior(COORDENADAS coord1, COORDENADAS coord2)
-{
-   bool retval = (coord1.longitude > coord2.longitude);
-   return retval;
-}
-
-bool FrameNav::ComparaLatitudeMenor(COORDENADAS coord1, COORDENADAS coord2)
-{
-   bool retval = (coord1.latitude < coord2.latitude);
-   return retval;
-}
-
-bool FrameNav::ComparaLongitudeMenor(COORDENADAS coord1, COORDENADAS coord2)
-{
-   bool retval = (coord1.longitude < coord2.longitude);
-   return retval;
 }
 
 void FrameNav::DesenhaSb(QPainter &painter, int x1, int coordy, int x2, std::string nomeSb)
@@ -98,243 +26,104 @@ void FrameNav::DesenhaSb(QPainter &painter, int x1, int coordy, int x2, std::str
 	painter.setBrush(brush);
 	painter.setPen(Qt::blue);
 	//largura da linha de sb em pixels
-	int tam = 24;
+	int tam = TAM_SB;
 	coordy = coordy - tam / 2;
 
 	painter.drawRect(x1, coordy, x2 - x1, tam);
 
 	painter.setPen(Qt::white);
-	painter.drawText(x1 + 10, coordy + 2 * (tam / 3), QString(nomeSb.c_str()));
+	painter.drawText(x1 + 15, coordy + 2 * (tam / 3), QString(nomeSb.c_str()));
 }
 
-void FrameNav::DesenhaLinhaPrincipal(QPainter &painter, int x1, int coordy, int x2)
+void FrameNav::DesenhaLinhaPrincipal(QPainter &painter, int x1, int x2)
 {
 	QBrush brush;
 
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(Qt::blue);
 	//largura da linha de sb em pixels
-	int tam = 24;
+	int tam = TAM_SB;
+	int coordy = COORDY_LINHAPRINCIPAL;
 	coordy = coordy - tam / 2;
 
-	painter.drawRect(x1, coordy, x2 - x1, tam);
+	painter.drawLine(x1, coordy, x2, coordy);
+	painter.drawLine(x1, coordy + tam, x2, coordy + tam);
+
+//	painter.drawRect(x1, COORDY_LINHAPRINCIPAL, x2 - x1, tam);
+}
+
+void FrameNav::DesenhaPn(QPainter &painter, int x1, int x2, PN_TIPO pn)
+{
+	QBrush brush;
+
+	if(pn == PN_INICIOPONTE || pn == PN_FIMPONTE)
+	{
+		brush.setColor(Qt::green);
+		brush.setStyle(Qt::SolidPattern);
+	}
+	else
+	{
+		brush.setColor(Qt::yellow);
+		brush.setStyle(Qt::SolidPattern);
+	}
+
+	painter.setBrush(brush);
+	painter.setPen(Qt::black);
+	
+	painter.drawRect(x1, COORDY_PN, x2 - x1, TAM_PN);
 }
 
 
 void FrameNav::DesenhaPontosNotaveis(QPainter &painter)
 {
-	//analisa pontos de tras para frente
-	//pega elemento mais antigo
-//	int inicioPonte;
-	int fimPonte;
-//	int inicioTunel;
-	int fimTunel;
+	std::vector <int> coordenadaEmUsoDireita;
+	std::vector <int> coordenadaEmUsoEsquerda;
 
-	int inicioLinhaPrincipal = -1;
-	int proximoiniciosb = width();
+	unsigned int tamvec = mvecGuiData.size();
 
-	if(mvecGuiData.size() > 0)
+//	if(tamvec > ((unsigned int)width() + 400))
+	if(tamvec > ((unsigned int)width() -100))
+	{
+		//vetor de dados maior que a tela + tolerancia, descarta pontos mais antigos
+		mvecGuiData.erase(mvecGuiData.begin(), mvecGuiData.begin() + 1/*300*/);
+		tamvec = mvecGuiData.size();
+	}
+
+	std::vector <GUI_DATA> guiData = mvecGuiData;
+
+	if(guiData.size() > 0)
 	{
 		bool fimPonteEncontrado = false;
 		bool fimTunelEncontrado = false;
-		bool fimSbEncontrado = false;
-		bool existeSbAberta = false;
-		int passagemNivel = 0;
 
-		int numsbabertadireita = 0;
-		int numsbabertaesquerda = 0;
+		//desenha indicador de leitura
+		QBrush brush;
+		static int counter = 0;
 
-		struct INICIOFIM_SB
+		brush.setStyle(Qt::SolidPattern);
+		brush.setColor(Qt::red);
+		painter.setBrush(brush);
+		painter.setPen(Qt::black);
+		painter.drawEllipse(QRect( 8, 8, 34, 34));
+
+		brush.setStyle(Qt::Dense4Pattern);
+		brush.setColor(Qt::white);
+		painter.setBrush(brush);
+		painter.setPen(Qt::black);
+		painter.drawPie(QRect(12, 12, 28, 28), (10 *counter++) * 16, (10 *counter++) * 16);
+		if(counter > 36)
+			counter = 0;
+
+
+
+		int pontox = width() - tamvec- 2;
+		for(unsigned int index = 0; index < tamvec; index++, pontox++)
 		{
-			std::string nomeSb;
-			int inicoSb;
-			int fimSb;
-			int coordY;
-			PN_INICIOTIPO desvio;
-		};
-
-		std::vector <INICIOFIM_SB> coordYSb;
-
-		unsigned int j;
-		unsigned int tamvec = mvecGuiData.size();
-		int pontox = width();
-
-		for(j = 0; j < tamvec; j++, pontox--)
-		{
-			GUI_DATA guiData = mvecGuiData[tamvec - j - 1];
-
-			switch(guiData.pn.pntipo)
+			switch(guiData[index].pn.pntipo)
 			{
 			case PN_COORDENADAS:
-/*				if(inicioLinhaPrincipal == -1)
-				{
-					inicioLinhaPrincipal = pontox;
-				}
 				//desenha linha principal 
-				DesenhaSb(painter, inicioLinhaPrincipal, COORDY_LINHAPRINCIPAL, width());
-//				painter.drawRect(pontox, COORDY_LINHAPRINCIPAL, width() - pontox, 15);*/
-			break;
-			case PN_INICIOPONTE:
-				//desenha linha de inicio até final
-				//se final ainda não foi marcado->desenha até limite do frame
-				if(fimPonteEncontrado)
-				{
-					//desenha linha até o fim da ponte
-					painter.drawLine(pontox, COORDY_PN, fimPonte, COORDY_PN);
-					fimPonteEncontrado = false;
-				}
-				else
-				{
-					painter.drawLine(pontox, COORDY_PN, width(), COORDY_PN);
-				}
-			break;
-
-			case PN_FIMPONTE:
-				fimPonteEncontrado = true;
-				fimPonte = pontox;
-			break;
-
-			case PN_INICIOTUNEL:
-				//desenha linha de inicio até final
-				//se final ainda não foi marcado->desenha até limite do frame
-				if(fimTunelEncontrado)
-				{
-					//desenha linha até o fim da ponte
-					painter.drawLine(pontox, COORDY_PN, fimTunel, COORDY_PN);
-					fimTunelEncontrado = false;
-				}
-				else
-				{
-					painter.drawLine(pontox, COORDY_PN, width(), COORDY_PN);
-				}
-			break;
-
-			case PN_FIMTUNEL:
-				fimTunelEncontrado = true;
-				fimTunel = pontox;
-			break;
-
-			case PN_PASSAGEMNIVEL:
-				painter.drawEllipse(QPoint(pontox, COORDY_PN), 10, 10);
-			break;
-
-			case PN_INICIOSB:
-				{
-
-					proximoiniciosb = pontox;
-
-					//procura pelo fim
-					bool fimEncontrado;
-					INICIOFIM_SB dsb;
-
-					fimEncontrado = false;
-
-					for(unsigned int i = 0, j = 0; i < coordYSb.size(); i++)
-					{
-						dsb = coordYSb[i];
-
-						if(dsb.fimSb != -1)
-						{
-							//esta sb tem um fim encontrado->procura pelo nome
-							if(dsb.nomeSb == guiData.pn.Sb)
-							{
-								fimEncontrado = true;
-
-								//desenha do começo ao fim
-								if(guiData.pn.pntipoinicio == PN_DESVIO_DIREITA)
-								{
-									//desenha linha abaixo da principal
-									int coordy = coordYSb[coordYSb.size() - i - 1].coordY = COORDY_LINHAPRINCIPAL + COORDY_DELTA + (numsbabertadireita++ * COORDY_DELTA);
-									DesenhaSb(painter, pontox, coordy, dsb.fimSb, guiData.pn.Sb);
-								}
-								else if(guiData.pn.pntipoinicio == PN_DESVIO_ESQUERDA)
-								{
-									//desenha linha acima da principal
-									int coordy = coordYSb[coordYSb.size() - i - 1].coordY = COORDY_LINHAPRINCIPAL - COORDY_DELTA - (numsbabertaesquerda++ * COORDY_DELTA);
-									DesenhaSb(painter, pontox, coordy, dsb.fimSb, guiData.pn.Sb);
-								}
-								else 
-								{
-									//desenha na linha principal
-									DesenhaSb(painter, pontox, COORDY_LINHAPRINCIPAL, dsb.fimSb, guiData.pn.Sb);
-								}
-
-								//removo da lista
-								std::vector<INICIOFIM_SB>::iterator it;
-								it = coordYSb.begin();
-								coordYSb.erase(it + i);
-
-								//reinicio o loop devido ao erase
-								i = 0;
-							}
-						}
-					}
-
-					if(fimEncontrado == false)
-					{
-						//não encontrado fim da sb->inicia o desenho de abertura de sb no pontox até fim do frame
-						dsb.inicoSb = pontox;
-						dsb.fimSb = -1;
-						dsb.desvio = guiData.pn.pntipoinicio;
-						dsb.nomeSb = guiData.pn.Sb;
-
-						coordYSb.push_back(dsb);
-
-						//traca linhas conforme numero de sbs abertas
-						for(unsigned int i = 0; i < coordYSb.size(); i++)
-						{
-							//pega sb aberta da mais recente para a mais antiga
-							dsb = coordYSb[coordYSb.size() - i - 1];
-
-							if(dsb.nomeSb == guiData.pn.Sb)
-							{
-								//desenha do começo ao fim
-								if(guiData.pn.pntipoinicio == PN_DESVIO_DIREITA)
-								{
-									//desenha linha abaixo da principal
-									int coordy = coordYSb[coordYSb.size() - i - 1].coordY = COORDY_LINHAPRINCIPAL + COORDY_DELTA + (numsbabertadireita++ * COORDY_DELTA);
-									DesenhaSb(painter, pontox, coordy, width(), guiData.pn.Sb);
-								}
-								else if(guiData.pn.pntipoinicio == PN_DESVIO_ESQUERDA)
-								{
-									//desenha linha acima da principal
-									int coordy = coordYSb[coordYSb.size() - i - 1].coordY = COORDY_LINHAPRINCIPAL - COORDY_DELTA - (numsbabertaesquerda++ * COORDY_DELTA);
-									DesenhaSb(painter, pontox, coordy, width(), guiData.pn.Sb);
-								}
-								else 
-								{
-									DesenhaSb(painter, pontox, COORDY_LINHAPRINCIPAL, width(), guiData.pn.Sb);
-								}
-							}
-						}
-					}
-				}
-			break;
-
-			case PN_FIMSB:
-				{
-					//adiciona Sb na fila de sbs para abrir
-					INICIOFIM_SB dsb;
-
-					dsb.nomeSb = guiData.pn.Sb;
-					dsb.fimSb = pontox;
-					coordYSb.push_back(dsb);
-
-					painter.setBrush(Qt::FDiagPattern);
-					painter.setPen(Qt::gray);
-
-					//desenha até o fim do frame indicação de sb fechada
-					//painter.drawRect(dsb.fimSb, 0, proximoiniciosb - dsb.fimSb, height());
-
-				}
-			break;
-
-			case PN_MARCO:
-				painter.drawLine(pontox, COORDY_LINHAPRINCIPAL - 50, pontox, COORDY_LINHAPRINCIPAL + 50); 
-			break;
-
-			case PN_MARCOAUTOMATICO:
-				painter.drawLine(pontox, COORDY_LINHAPRINCIPAL - 50, pontox, COORDY_LINHAPRINCIPAL + 50); 
+				DesenhaLinhaPrincipal(painter, pontox, width());
 			break;
 
 			case PN_MARCOINICIAL:
@@ -343,11 +132,269 @@ void FrameNav::DesenhaPontosNotaveis(QPainter &painter)
 
 				//desenha linha vertical do marco
 				painter.drawLine(pontox, COORDY_LINHAPRINCIPAL - 50, pontox, COORDY_LINHAPRINCIPAL + 50); 
-
-				//desenha linha principal
-				DesenhaLinhaPrincipal(painter, pontox, COORDY_LINHAPRINCIPAL, width());
 			break;
 
+			case PN_INICIOPONTE:
+				//procura final da ponte
+				int fimPonte;
+				
+				fimPonte = pontox;
+				fimPonteEncontrado = false;
+
+				for(auto ptrponte = guiData.begin() + index; ptrponte != guiData.end(); ptrponte++, fimPonte++)
+				{
+					if((*ptrponte).pn.pntipo == PN_FIMPONTE)
+					{
+						fimPonteEncontrado = true;
+						break;
+					}
+				}
+
+				//desenha ponte até o fim da ponte ou fim do frame
+				DesenhaPn(painter, pontox, fimPonte, PN_INICIOPONTE);
+			break;
+
+			case PN_FIMPONTE:
+				if(!fimPonteEncontrado)
+				{
+					//fim de ponte não foi encontrado->não tem inicio de ponte no vetor
+					//desenha até começo do frame
+					DesenhaPn(painter, x(), pontox, PN_FIMPONTE);
+				}
+				else
+				{
+					//fim de ponte já encontrado porque inicio já foi processado->nada precisa fazer
+				}
+			break;
+
+			case PN_INICIOTUNEL:
+				//procura final da ponte
+				int fimTunel;
+				
+				fimTunel = pontox;
+				fimTunelEncontrado = false;
+
+				for(auto ptrtunel = guiData.begin() + index; ptrtunel != guiData.end(); ptrtunel++, fimTunel++)
+				{
+					if((*ptrtunel).pn.pntipo == PN_FIMTUNEL)
+					{
+						fimTunelEncontrado = true;
+						break;
+					}
+				}
+
+				//desenha
+				DesenhaPn(painter, pontox, fimTunel, PN_INICIOTUNEL);
+
+			break;
+
+			case PN_FIMTUNEL:
+				if(!fimTunelEncontrado)
+				{
+					//fim de tunel não foi encontrado->não tem inicio de ponte no vetor
+					//desenha até começo do frame
+					DesenhaPn(painter, x(), pontox, PN_FIMTUNEL);
+				}
+				else
+				{
+					//fim de tunel já encontrado porque inicio já foi processado->nada precisa fazer
+				}
+			break;
+
+			case PN_PASSAGEMNIVEL:
+				painter.drawEllipse(QPoint(pontox, COORDY_PN), 10, 10);
+			break;
+
+			case PN_INICIOSB:
+				//procura final da sb
+				int fimSb;
+				fimSb = pontox;
+
+				for(auto ptrsb = guiData.begin() + index; ptrsb != guiData.end(); ptrsb++, fimSb++)
+				{
+					if((*ptrsb).pn.pntipo == PN_FIMSB)
+					{
+						//verifica se foi encontrado fim desta sb
+						if((*ptrsb).pn.Sb == guiData[index].pn.Sb)
+						{
+							fimPonteEncontrado = true;
+							break;
+						}
+					}
+				}
+
+				int coordy;
+				int delta;
+				
+				delta = 0;
+				//desenha do começo ao fim
+				if(guiData[index].pn.pntipoinicio == PN_DESVIO_DIREITA)
+				{
+					//desenha linha abaixo da principal->verifica qual coordenada Y não está em uso
+
+					for(delta = 0; delta < 5; delta++)
+					{
+						bool emUso = false;
+						for(unsigned int i = 0; i < coordenadaEmUsoDireita.size(); i++)
+						{
+							if(coordenadaEmUsoDireita[i] == delta)
+							{
+								//coordenada em uso->pula para proxima
+								emUso = true;
+								break;
+							}
+						}
+						if(!emUso)
+						{
+							break;
+						}
+					}
+					
+					//guarda coordenada como em uso
+					coordenadaEmUsoDireita.push_back(delta);
+
+					coordy = COORDY_LINHAPRINCIPAL + COORDY_DELTA + delta * COORDY_DELTA;
+				}
+				else if(guiData[index].pn.pntipoinicio == PN_DESVIO_ESQUERDA)
+				{
+					for(delta = 0; delta < 5; delta++)
+					{
+						bool emUso = false;
+						for(unsigned int i = 0; i < coordenadaEmUsoEsquerda.size(); i++)
+						{
+							if(coordenadaEmUsoEsquerda[i] == delta)
+							{
+								//coordenada em uso->pula para proxima
+								emUso = true;
+								break;
+							}
+						}
+						if(!emUso)
+						{
+							break;
+						}
+					}
+					
+					//guarda coordenada como em uso
+					coordenadaEmUsoEsquerda.push_back(delta);
+
+					//desenha linha acima da principal
+					coordy = COORDY_LINHAPRINCIPAL - COORDY_DELTA - delta * COORDY_DELTA;
+				}
+				else 
+				{
+					//desenha na linha principal
+					coordy = COORDY_LINHAPRINCIPAL;
+				}
+
+				DesenhaSb(painter, pontox, coordy, fimSb, guiData[index].pn.Sb);
+				//guarda Sb no vetor de começos de sb
+				//se não estiver->guarda
+				//se já estiver->atualiza
+				{
+					bool encontrado = false;
+					for(auto ptr = comecoSb.begin(); ptr != comecoSb.end() && encontrado == false; ptr++)
+					{
+						if((*ptr).nomeSb == guiData[index].pn.Sb)
+						{
+							//encontrou no vetor->atualiza dados
+							(*ptr).coordY = coordy;
+							(*ptr).delta = delta;
+							encontrado = true;
+						}
+					}
+
+
+					if(encontrado == false)
+					{
+						INICIOFIM_SB sb;
+						sb.coordY = coordy;
+						sb.delta = delta;
+						sb.nomeSb = guiData[index].pn.Sb;
+						sb.tipoinicio = guiData[index].pn.pntipoinicio;
+						comecoSb.push_back(sb);
+						//ajusta tamanho do vetor para guardar até 100 sbs->apenas segurança
+						if(comecoSb.size() > 100)
+						{
+							comecoSb.resize(100);
+						}
+					}
+				}
+			break;
+
+			case PN_FIMSB:
+				{
+					bool comecoEncontrado = false;
+					std::string strsb = guiData[index].pn.Sb;
+
+					for(auto ptrsb = guiData.rbegin(); ptrsb != guiData.rend(); ptrsb++)
+					{
+						if((*ptrsb).pn.Sb == strsb && ((*ptrsb).pn.pntipo == PN_INICIOSB))
+						{
+							//comeco da sb encontrado
+							comecoEncontrado = true;
+							break;
+						}
+					}
+
+					//procura inicio para definir coordenada y do desenho do fim de sb
+					for(auto ptrsb = comecoSb.begin(); ptrsb != comecoSb.end(); ptrsb++)
+					{
+						//se não encontrar começo->ignora fim da sb (tratar no pós-processamento
+						if((*ptrsb).nomeSb == strsb)
+						{
+							//se começo encontrado não precisa fazer nada, basta desenhar hachurado
+							if(!comecoEncontrado)
+							{
+								//começo da sb não encontrado->desenha até começo do frame na coordenada Y
+								DesenhaSb(painter, x(), coordy, pontox, guiData[index].pn.Sb);
+							}
+
+							//desenha hachurado
+							painter.setBrush(Qt::FDiagPattern);
+							painter.setPen(Qt::lightGray);
+							painter.drawRect(pontox, 0, 20, height());
+
+							if((*ptrsb).tipoinicio == PN_DESVIO_DIREITA)
+							{
+								//eliminar coordenada em uso->permite desenho da proxima abertura de sb na mesma coordenada
+								for(unsigned int i = 0; i < coordenadaEmUsoDireita.size(); i++)
+								{
+									if((*ptrsb).delta == coordenadaEmUsoDireita[i])
+									{
+										coordenadaEmUsoDireita.erase(coordenadaEmUsoDireita.begin() + i);
+									}
+								}
+							}
+							else if((*ptrsb).tipoinicio == PN_DESVIO_ESQUERDA)
+							{
+								//eliminar coordenada em uso->permite desenho da proxima abertura de sb na mesma coordenada
+								for(unsigned int i = 0; i < coordenadaEmUsoEsquerda.size(); i++)
+								{
+									if((*ptrsb).delta == coordenadaEmUsoEsquerda[i])
+									{
+										coordenadaEmUsoEsquerda.erase(coordenadaEmUsoEsquerda.begin() + i);
+									}
+								}
+							}
+						}
+					}
+				}
+			break;
+
+			case PN_MARCO:
+				painter.setPen(Qt::black);
+				painter.setBrush(Qt::VerPattern);
+
+				painter.drawLine(pontox, COORDY_LINHAPRINCIPAL - 50, pontox, COORDY_LINHAPRINCIPAL + 50); 
+			break;
+
+			case PN_MARCOAUTOMATICO:
+				painter.setPen(Qt::black);
+				painter.setBrush(Qt::VerPattern);
+
+				painter.drawLine(pontox, COORDY_LINHAPRINCIPAL - 50, pontox, COORDY_LINHAPRINCIPAL + 50); 
+			break;
 			}
 		}
 	}
@@ -360,25 +407,5 @@ void FrameNav::AddPontos(COORDENADAS coord, PN_DATA pn)
 	t.coord = coord;
 	t.pn = pn;
 
-	//processa dados
-	switch(pn.pntipo)
-	{
-	case PN_COORDENADAS:
-		//marcação de coordenadas-> a cada 10 leituras
-//		if(mpasso > NUMERO_PASSOCOORDENADAS)
-		{
-			//adiciona o ponto
-			mvecGuiData.push_back(t);
-//			mpasso = 0;
-		}
-//		else
-//		{
-//			mpasso++;
-//		}
-
-	break;
-	default:
-		mvecGuiData.push_back(t);
-	break;
-	}
+	mvecGuiData.push_back(t);
 }
